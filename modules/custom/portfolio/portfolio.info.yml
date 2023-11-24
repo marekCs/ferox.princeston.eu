@@ -1,0 +1,7 @@
+name: Portfolio
+type: module
+description: Create Portfolio views grid filter.
+core_version_requirement: ^8 || ^9 || ^10
+package: Huge
+dependencies:
+  - views

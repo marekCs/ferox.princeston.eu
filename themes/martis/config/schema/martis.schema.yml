@@ -1,0 +1,4 @@
+# Schema for the configuration files of the martis theme.
+martis.settings:
+  type: theme_settings
+  label: 'Martis Settings'

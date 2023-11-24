@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 1280x853
+label: 1280x853
+effects:
+  2965b48c-9088-4550-b905-23e7ccca65b5:
+    uuid: 2965b48c-9088-4550-b905-23e7ccca65b5
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 1280
+      height: 853
+      anchor: center-center

@@ -1,0 +1,12 @@
+nonce:
+  dependencies:
+    - core/drupalSettings
+
+admin:
+  css:
+    theme:
+      css/csp.admin.css: {}
+  js:
+    js/csp.admin.js: {}
+  dependencies:
+    - core/jquery

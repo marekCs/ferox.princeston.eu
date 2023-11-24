@@ -1,0 +1,9 @@
+name: Votingapi Widgets
+type: module
+description: 'Voting API Widgets.'
+package: Voting
+core_version_requirement: ^9.2 || ^10
+
+dependencies:
+  - votingapi:votingapi
+  - drupal:field

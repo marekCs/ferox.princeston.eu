@@ -1,0 +1,24 @@
+<div{{ attributes }}>
+  <div class="cart-block--summary">
+    <a class="cart-block--link__expand" href="{{ url }}">
+        <i class="ti-shopping-cart"></i>
+      <span class="cart-block--summary__count"> {{ count }}</span>
+	</a>
+  </div>
+  {% if content %}
+  <div class="cart-block--contents">
+    <div class="cart-block--contents__inner">
+      <div class="cart-block--contents__items">
+        {{ content }}
+      </div>
+      <div class="cart-block--contents__links cart-block-link">
+        {{ links }}
+      </div>
+    </div>
+  </div>
+  {% else %}
+      <div class="cart-block--contents text-center cart-block-empty">
+        {{ 'Cart is empty.'|t }}
+      </div>
+  {% endif %}
+</div>

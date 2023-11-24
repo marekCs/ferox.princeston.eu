@@ -1,0 +1,82 @@
+{# @file martis footer #}
+<footer id="footer" class="footer {{ footer_theme }}">
+	<!-- start Footer -->
+	{% if page.footer_first or page.footer_second or page.footer_third or page.footer_forth or page.footer_fifth %}
+	  <div class="footer-widget">
+		<div class="container">
+			<div class="row">
+			{% if page.footer_first %}
+			<!-- Start Footer First Region -->
+			<div class="{{ footer_first_size }} footer-widget-section">
+				{{ page.footer_first }}
+			</div>
+			<!-- End Footer First Region -->
+			{% endif %}
+
+			{% if page.footer_second %}
+			<!-- Start Footer Second Region -->
+			<div class="{{ footer_second_size }} footer-widget-section">
+				{{ page.footer_second }}
+			</div>
+			<!-- End Footer Second Region -->
+			{% endif %}
+
+			{% if page.footer_third %}
+			<!-- Start Footer Third Region -->
+			<div class="{{ footer_third_size }} footer-widget-section">
+				{{ page.footer_third }}
+			</div>
+			<!-- End Footer Third Region -->
+			{% endif %}
+			
+			{% if page.footer_forth %}
+			<!-- Start Footer Forth Region -->
+			<div class="{{ footer_forth_size }} footer-widget-section">
+				{{ page.footer_forth }}
+			</div>
+			<!-- End Footer Forth Region -->
+			{% endif %}
+			
+			{% if page.footer_fifth %}
+			<!-- Start Footer Fifth Region -->
+			<div class="{{ footer_fifth_size }} footer-widget-section">
+				{{ page.footer_fifth }}
+			</div>
+			<!-- End Footer Fifth Region -->
+			{% endif %}
+			
+			{% if page.footer_sixth %}
+			<!-- Start Footer Sixth Region -->
+			<div class="{{ footer_sixth_size }} footer-widget-section">
+				{{ page.footer_sixth }}
+			</div>
+			<!-- End Footer SIXth Region -->
+			{% endif %}			
+			</div>
+		</div>
+	  </div>
+	{% endif %}
+	<!--End Footer -->
+
+{% if page.footer_bottom_first or page.footer_bottom_second %}
+	<div class="footer-bottom">
+	  <div class="container">
+		<div class="row">
+		  {% if page.footer_bottom_first %}
+		  <div class="{{ footerbottomcol }} footer-bottom-first">
+			{{ page.footer_bottom_first }}
+		  </div>
+		  {% endif %}
+		  {% if page.footer_bottom_second %}
+		  <div class="{{ footerbottomcol }} footer-bottom-second">
+			{{ page.footer_bottom_second }}
+		  </div>
+		  {% endif %}
+		</div>
+	  </div>
+	</div>
+{% endif %}
+</footer>
+{% if scrolltop %}
+	<div class="back-to-top"><span class="ti-angle-up"></span></div>
+{% endif %}

@@ -1,0 +1,4 @@
+# Schema for the configuration files of the martis sub theme.
+martis_sub.settings:
+  type: theme_settings
+  label: 'Martis Sub Settings'

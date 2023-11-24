@@ -1,0 +1,23 @@
+{#
+/**
+ * @file
+ * Default theme implementation for a 'form' element.
+ *
+ * Available variables
+ * - attributes: A list of HTML attributes for the wrapper element.
+ * - children: The child elements of the form.
+ *
+ * @see template_preprocess_form()
+ *
+ * @ingroup themeable
+ */
+#}
+{% extends "form--user-form.html.twig" %}
+{% block form_header %}
+  {{ 'Reset your password'|t }}
+{% endblock %}
+{% block form_footer %}
+  <h4 class="form-title">{{('Back to:'|t)}}</h4>
+  <a class="button" href="{{ path('user.login') }}">{{ 'Login'|t }}</a>
+  <a class="button"  href="{{ path('user.register') }}">{{ 'Register'|t }}</a>
+{% endblock %}

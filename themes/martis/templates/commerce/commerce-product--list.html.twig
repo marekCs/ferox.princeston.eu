@@ -1,0 +1,59 @@
+{#
+/**
+ * @file
+ *
+ * Default product template.
+ *
+ * Available variables:
+ * - attributes: HTML attributes for the wrapper.
+ * - product: The rendered product fields.
+ *   Use 'product' to print them all, or print a subset such as
+ *   'product.title'. Use the following code to exclude the
+ *   printing of a given field:
+ *   @code
+ *   {{ product|without('title') }}
+ *   @endcode
+ * - product_entity: The product entity.
+ * - product_url: The product URL.
+ *
+ * @ingroup themeable
+ */
+#}
+{%
+  set classes = [
+	'product-teaser',
+	'row',
+  ]
+%}
+
+<div class="product-teaser-wrap product-list-wrap {{ product_teaser }}">
+<div{{ attributes.addClass(classes) }}>
+{% if product.variation_field_image|render %}
+<div class="post-image product-image col-md-4">
+	{{ product.variation_field_image }}
+</div>
+{% endif %}
+<div class="product-meta-wrap col-md-8">
+<div class="product-meta">
+<div class="product-title"><a class="product-title-link" href="{{ product_url }}">{{ product.title }}</a></div>
+<div class="product-ratings">{{ product.field_ratings }}</div>
+<div class="product-price-wrap">
+	{% if product.variation_list_price|render|striptags|trim %}
+		<div class="product-old-price"><del>{{ product.variation_list_price }}</del></div>
+	{% endif %}
+	<div class="product-price">{{ product.variation_price }}</div> 
+</div>
+
+</div>
+
+{#
+<div class="product-variation-wrap">
+<div class="product-variation-container">
+	<div class="product-add-cart">{{ product.variations }}</div>
+</div>
+</div>
+#}
+
+</div>
+</div>
+</div>

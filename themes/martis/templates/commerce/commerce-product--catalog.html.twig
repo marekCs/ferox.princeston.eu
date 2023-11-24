@@ -1,0 +1,80 @@
+{#
+/**
+ * @file
+ *
+ * Default product template.
+ *
+ * Available variables:
+ * - attributes: HTML attributes for the wrapper.
+ * - product: The rendered product fields.
+ *   Use 'product' to print them all, or print a subset such as
+ *   'product.title'. Use the following code to exclude the
+ *   printing of a given field:
+ *   @code
+ *   {{ product|without('title') }}
+ *   @endcode
+ * - product_entity: The product entity.
+ * - product_url: The product URL.
+ *
+ * @ingroup themeable
+ */
+#}
+{%
+  set classes = [
+	'product-teaser',
+  ]
+%}
+<div class="product-teaser-wrap {{ product_teaser_attribute }}">
+	<div{{ attributes.addClass(classes) }}>
+	<div class="product-teaser-bg"></div>
+	<div class="product-teaser-container">
+		<div class="post-image product-image">
+		{% if product.variation_field_image|render %}
+			{% if product.field_badge|render %}
+				<div class="product-badge">
+				{% if product.field_badge['#items'].getValue()|first.value == "new" %} 
+				<span class="badge-label badge-new">{{ 'New'|t }}</span>
+				{% elseif product.field_badge['#items'].getValue()|first.value == "sale" %} 
+				<span class="badge-label badge-sale">{{ 'Sale'|t }}</span>
+				{% elseif product.field_badge['#items'].getValue()|first.value == "hot" %} 
+				<span class="badge-label badge-hot">{{ 'Hot'|t }}</span>
+				{% endif %}
+				</div>
+			{% endif %}	
+		{{- product.variation_field_image -}}
+		{% endif %}
+		<div class="product-icon-wrap">
+			<div class="product-icon product-view"><a href="{{ product_url }}" class="flag-link use-ajax" data-dialog-options="{&quot;width&quot;:680, &quot;dialogClass&quot;: &quot;product-quick-view&quot;}" data-dialog-type="modal" title="Quick View"><i class="ti-search"></i><span class="flag-title">{{ 'Quick View'|t }}</span></a></div>
+			<div class="product-icon product-add-wishlist">{{- product.flag_wishlist -}}</div>
+			<div class="product-icon product-add-compare">{{- product.flag_compare -}}</div>
+		</div>
+		</div>
+		<div class="product-meta-wrap">
+			<div class="product-meta">
+				<div class="product-ratings">{{- product.field_ratings -}}</div>
+				<div class="product-title"><a class="product-title-link" href="{{- product_url -}}">{{- product.title -}}</a></div>
+				<div class="product-price-wrap">
+					{% if product.variation_list_price|render|striptags|trim %}
+						<div class="product-old-price"><del>{{- product.variation_list_price -}}</del></div>
+					{% endif %}
+					<div class="product-price">{{- product.variation_price -}}</div>
+				</div>
+			</div>
+			
+			<div class="product-variation-wrap">
+				<div class="product-add-cart">
+				<div class="has-no-option-variation">{{- product.variations -}}</div>
+				<div class="form-actions product-select has-option-variation">
+				<a class="button" href="{{- product_url -}}">{{ 'Select Option'|t }}</a>
+				</div>
+				</div>
+				
+				{% if product.field_short_description|render %}
+				<div class="product-desc">{{- product.field_short_description -}}</div>
+				{% endif %}
+			</div>
+		
+		</div>
+	</div>
+	</div>
+</div>

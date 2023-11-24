@@ -1,0 +1,9 @@
+name: Views Bootstrap Grid
+type: module
+description: Allow Bootstrap Grid to display Views contents 
+package: Huge
+core_version_requirement: ^8 || ^9 || ^10
+version: '8.x-1.0'
+project: 'views_bootstrap_grid'
+dependencies:
+  - views

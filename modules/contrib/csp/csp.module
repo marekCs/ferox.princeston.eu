@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * CSP module hooks.
+ */
+
+function csp_page_attachments_alter(array &$attachments) {
+  // Remove inline anti-flicker JS in 10.1+.
+  // @see https://www.drupal.org/node/3350272
+  $attachments['#attached']['html_head'] = array_filter(
+    $attachments['#attached']['html_head'],
+    function($item) {
+      return $item[1] !== 'anti_flicker_js';
+    }
+  );
+}

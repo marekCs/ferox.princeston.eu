@@ -1,0 +1,653 @@
+<?php
+
+/**
+ * @file
+ * martis_theme
+ *
+ * Filename:     Martis Theme
+ * Website:      http://www.hugestem.com
+ * Description:  Drupal Commerce Template
+ * Author:       HUGESTEM
+ */
+ //define('THEME_PATH', base_path() . drupal_get_path('theme', 'martis'));
+ define('THEME_PATH', \Drupal::service('theme_handler')->getTheme('martis')->getPath());
+
+
+use Drupal\Core\Template\RenderWrapper;
+use Drupal\Core\Template\Attribute;
+use Drupal\search\Form\SearchBlockForm;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\system\Form\ThemeSettingsForm;
+use Drupal\block\Entity\Block;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
+use Drupal\path_alias\AliasManagerInterface;
+use Drupal\path_alias\PathProcessor\AliasPathProcessor;
+use Drupal\taxonomy\Entity\Term;
+
+function martis_views_pre_render(\Drupal\views\ViewExecutable $view) {
+  if ($view->id() == "frontpage" && $view->current_display == 'page_1') {
+    // Use some or all of the following 3 lines to remove specific
+    // 'no results' behaviors
+    unset($view->empty['area_text_custom']);
+    unset($view->empty['node_listing_empty']);
+    unset($view->empty['title']);
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function martis_theme_suggestions_form_alter(&$suggestions, $variables) {
+  $form_id = $variables['element']['#form_id'];
+  if (in_array($form_id, ['user_login_form','user_register_form','user_pass']))  {
+    $suggestions[] = 'form__' . $form_id;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function martis_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Display the "Forgot your password?" link under the password input.
+  $pass_link = Link::fromTextAndUrl(t('Forgot your password?'), Url::fromUri('route:user.pass', ['attributes' => ['class' => ['pass-link']]]))->toString();
+  $form['pass']['#suffix'] = $pass_link;
+}
+
+/**
+ * Implements hook_preprocess_page() for templates.
+ */
+function martis_preprocess_page(&$variables) {
+  // DYNAMIC CLASS FOR THE NUMBER OF SIDEBARS
+  if (!empty($variables['page']['sidebar_first']) && !empty($variables['page']['sidebar_second'])) {
+		$variables['contentcol'] = 'col-md-6 center-content';
+		$variables['sideleftcol'] = 'col-md-3';
+		$variables['siderightcol'] = 'col-md-3';
+  }
+  elseif (!empty($variables['page']['sidebar_first'])) {
+		$variables['contentcol'] = 'col-md-9 right-content';
+		$variables['sideleftcol'] = 'col-md-3';
+  }
+  elseif (!empty($variables['page']['sidebar_second'])) {
+		$variables['contentcol'] = 'col-md-9 left-content';
+		$variables['siderightcol'] = 'col-md-3';
+  }
+  else {
+    $variables['contentcol'] = 'col-md-12';
+  }
+
+  // DYNAMIC CLASS FOR CONTENT WIDGET
+  if (!empty($variables['page']['content_widget_first']) && !empty($variables['page']['content_widget_second']) && !empty($variables['page']['content_widget_third'])) {
+		$variables['widgetfirstcol'] = 'col-md-4';
+		$variables['widgetsecondcol'] = 'col-md-4';
+		$variables['widgetthirdcol'] = 'col-md-4';
+  }
+  elseif (!empty($variables['page']['content_widget_first']) && !empty($variables['page']['content_widget_second'])) {
+		$variables['widgetfirstcol'] = 'col-md-6';
+		$variables['widgetsecondcol'] = 'col-md-6';
+  }
+  elseif (!empty($variables['page']['content_widget_first']) && !empty($variables['page']['content_widget_third'])) {
+		$variables['widgetfirstcol'] = 'col-md-4';
+		$variables['widgetthirdcol'] = 'col-md-8';
+  }
+  elseif (!empty($variables['page']['content_widget_second']) && !empty($variables['page']['content_widget_third'])) {
+		$variables['widgetsecondcol'] = 'col-md-3';
+		$variables['widgetthirdcol'] = 'col-md-9';
+  }
+  else {
+    $variables['widgetfirstcol'] = 'col-md-12';
+	$variables['widgetsecondcol'] = 'col-md-12';
+	$variables['widgetthirdcol'] = 'col-md-12';
+  } 
+ 
+  // DYNAMIC CLASS FOR HEADER MAIN MENU
+  if (!empty($variables['page']['header_category_menu']) && !empty($variables['page']['main_menu_right'])) {
+		$variables['mainmenucol'] = 'col-md-6';
+		$variables['mainmenuleftcol'] = 'col-md-3';
+		$variables['mainmenurightcol'] = 'col-md-3';
+  }
+  elseif (!empty($variables['page']['header_category_menu'])) {
+		$variables['mainmenucol'] = 'col-md-9';
+		$variables['mainmenuleftcol'] = 'col-md-3';
+  }
+  elseif (!empty($variables['page']['main_menu_right'])) {
+		$variables['mainmenucol'] = 'col-md-9';
+		$variables['mainmenurightcol'] = 'col-md-3';
+  }
+  else {
+    $variables['mainmenucol'] = 'col-md-12';
+  }
+ 
+  // DYNAMIC CLASS FOR FOOTER BOTTOM
+  if (!empty($variables['page']['footer_bottom_first']) && !empty($variables['page']['footer_bottom_second'])) {
+		$variables['footerbottomcol'] = 'col-md-6';
+  }
+  else {
+    $variables['footerbottomcol'] = 'col-md-12';
+  }  
+
+  // BASIC SETTINGS VARIABLE
+  $variables['preloader'] = theme_get_setting('preloader');
+  $variables['scrolltop'] = theme_get_setting('scrolltop'); 
+
+  // LAYOUT SETTINGS VARIABLE
+  $variables['site_layout'] = theme_get_setting('site_layout');
+  $variables['btn_style'] = theme_get_setting('btn_style');
+  $variables['color_scheme'] = theme_get_setting('color_scheme');
+
+  // HEADER SETTINGS VARIABLE
+  $variables['header_style'] = theme_get_setting('header_style');
+  $variables['nav_align'] = theme_get_setting('nav_align');
+  $variables['sticky_header'] = theme_get_setting('sticky_header');
+  $variables['header_top_theme'] = theme_get_setting('header_top_theme');
+  $variables['page_title_style'] = theme_get_setting('page_title_style');
+  $variables['page_title_theme'] = theme_get_setting('page_title_theme');
+  $variables['cart_icon_theme'] = theme_get_setting('cart_icon_theme');
+  
+  // FOOTER SETTINGS VARIABLE
+  $variables['footer_first_size'] = theme_get_setting('footer_first_size');
+  $variables['footer_second_size'] = theme_get_setting('footer_second_size');
+  $variables['footer_third_size'] = theme_get_setting('footer_third_size');
+  $variables['footer_forth_size'] = theme_get_setting('footer_forth_size');
+  $variables['footer_fifth_size'] = theme_get_setting('footer_fifth_size');
+  $variables['footer_sixth_size'] = theme_get_setting('footer_sixth_size');
+  $variables['footer_theme'] = theme_get_setting('footer_theme'); 
+}
+
+/**
+ * Implements hool_preprocess_HOOK() for html.html.twig
+ */
+function martis_preprocess_html(&$variables) {
+  $variables['rtl'] = theme_get_setting('rtl');
+  $variables['custom_css'] = theme_get_setting('custom_css');
+  
+  if ($node = \Drupal::request()->attributes->get('node')) {
+    $variables['attributes']['class'][] = 'page-node-' . $node->id();
+  }
+  $current_path = \Drupal::service('path.current')->getPath();
+  //$variables['current_path'] = \Drupal::service('path.alias_manager')->getAliasByPath($current_path);
+  $variables['current_path'] = \Drupal::service('path_alias.manager')->getAliasByPath($current_path);
+  
+  // LANGUAGE STYLE VARIABLE
+   $language = Drupal::languageManager()->getCurrentLanguage();
+   if ( ($language->getDirection() == "rtl") || ($variables['rtl']) ) {
+		$variables['#attached']['library'][] = 'martis/style-rtl';
+   }
+}
+
+/**
+ * Implements hool_preprocess_HOOK() for commerce-product.html.twig
+ */
+function martis_preprocess_commerce_product(&$variables) {
+  $variables['product_teaser_attribute'] = theme_get_setting('product_teaser_attribute');
+  $variables['product_teaser_icon'] = theme_get_setting('product_teaser_icon');
+  $variables['product_image_effect'] = theme_get_setting('product_image_effect');
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter() for page 404.
+ */
+function martis_theme_suggestions_page_alter(array &$suggestions, array $variables) {
+  $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
+  $suggestions = theme_get_suggestions($path_args, 'page');
+  $http_error_suggestions = [
+    'system.401' => 'page__401',
+    'system.403' => 'page__403',
+    'system.404' => 'page__404',
+  ];
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if (isset($http_error_suggestions[$route_name])) {
+    $suggestions[] = $http_error_suggestions[$route_name];
+  }
+  return $suggestions;
+}
+
+/**
+ * Implements hook_preprocess_breadcrumb().
+ */
+function martis_preprocess_breadcrumb(&$variables) {
+  if ($variables['breadcrumb']) {
+    $request = \Drupal::request();
+    $route_match = \Drupal::routeMatch();
+    $page_title = \Drupal::service('title_resolver')->getTitle($request, $route_match->getRouteObject());
+    
+    if (!empty($page_title)) {
+      $variables['breadcrumb'][] = [
+        'text' => $page_title,
+        'attributes' => new Attribute(['class' => ['active']])
+      ];
+	  $variables['#cache']['contexts'][] = 'url';
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter() for block templates.
+ */
+function martis_theme_suggestions_block_alter(array &$suggestions, array $variables) {
+  if (isset($variables['elements']['content']['#block_content'])) {
+    array_splice($suggestions, 1, 0, 'block__' . $variables['elements']['content']['#block_content']->bundle());
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function martis_theme_suggestions_field_alter(&$suggestions, $variables) {
+  $element = $variables['element'];
+  // Field template suggestions based on view mode.
+  $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#field_name'] . '__' . $element['#view_mode'];
+}
+
+/**
+ * hide wysiwyg from comments.
+ */
+function martis_form_alter(&$form, &$form_state, $form_id) {
+	if ($form_id == 'comment_form') {
+		$form['comment_filter']['format'] = array();
+	}
+}
+
+/**
+ * Implements hook_preprocess_user().
+ */
+function martis_preprocess_user(&$variables) {
+  $view_mode = isset($variables['elements']['#view_mode']) ? $variables['elements']['#view_mode'] : 'default';
+  $variables['attributes']['class'][] = $view_mode;
+  $variables['view_mode'] = $view_mode;
+
+  $user = $variables['user'];
+  $variables['name'] = $user->label();
+}
+
+/**
+ * Implements hook_form_system_theme_settings_alter().
+ */
+function martis_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface &$form_state) {
+	$form['#attached']['library'][] = 'martis/theme-setting';
+
+	$form['martis_settings'] = [
+		'#type' => 'vertical_tabs',
+		'#parents' => ['martis_settings'],
+	];
+	
+	// DEFAULT DRUPAL SETTINGS   
+	$form['drupal_default_settings'] = array(
+		'#type' => 'details',
+		'#title' => t('Drupal Core Settings'),
+		'#group' => 'martis_settings',
+		'#weight' => 0
+	);
+
+	$form['theme_settings']['#group'] = 'drupal_default_settings';
+	$form['favicon']['#group'] = 'drupal_default_settings';
+	$form['logo']['#group'] = 'drupal_default_settings';
+
+	// BASIC SETTINGS
+	$form['basic_settings'] = array(
+		'#type' => 'details',
+		'#title' => t('General'),
+		'#group' => 'martis_settings',
+		//'#weight' => 0
+	);
+
+	// PRELOADER
+    $form['basic_settings']['preloader'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Show Preloader'),
+        '#description'   => t('Use the checkbox to enable or disable the preloader.'),
+        '#default_value' => theme_get_setting('preloader'),
+    );
+	// SCROLL TO TOP BUTTON
+    $form['basic_settings']['scrolltop'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Show scroll to top button'),
+        '#description'   => t('Use the checkbox to enable or disable scroll to top button.'),
+        '#default_value' => theme_get_setting('scrolltop'),
+    );
+
+	// LAYOUT
+	$form['layout'] = array(
+		'#type' => 'details',
+		'#title' => t('Layout'),
+		'#group' => 'martis_settings',
+	);
+	
+	// SITE LAYOUT
+    $form['layout']['site_option'] = array(
+      '#type' => 'fieldset',
+	  '#title' => t('Layout Settings'),
+    );
+	$form['layout']['site_option']['site_layout'] = array(
+        '#type' => 'select',
+        '#default_value' => theme_get_setting('site_layout'),
+		'#options' => array(
+					'standard-layout' => t('Standard Layout'),
+					'wide-layout' => t('Wide Layout'),
+					'framed-layout' => t('Framed Layout'),
+					'boxed-layout' => t('Boxed Layout'),
+			),
+    );
+	
+	// SITE LAYOUT
+    $form['layout']['lang_option'] = array(
+      '#type' => 'fieldset',
+	  '#title' => t('Language Settings'),
+    );
+	
+	// RTL
+    $form['layout']['lang_option']['rtl'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable RTL'),
+        '#description'   => t('Use the checkbox to enable or disable support for Right to Left Language.'),
+        '#default_value' => theme_get_setting('rtl'),
+    );
+	
+	// THEME COLOR SCHEME
+    $form['layout']['color_style'] = array(
+      '#type' => 'fieldset',
+	  '#title' => t('Theme Color Scheme'),
+    );
+		// COLOR SCHEME
+		$form['layout']['color_style']['color_scheme'] = array(
+			'#type' => 'select',
+			'#default_value' => theme_get_setting('color_scheme'),
+			'#options' => array(
+						'light-scheme' => t('Light Scheme'),
+						'dark-scheme' => t('Dark Scheme'),
+				),
+		);
+	
+	// BUTTON LAYOUT
+    $form['layout']['btn_layout'] = array(
+      '#type' => 'fieldset',
+	  '#title' => t('Button Settings'),
+    );
+		// BUTTON STYLE
+		$form['layout']['btn_layout']['btn_style'] = array(
+			'#type' => 'select',
+			'#default_value' => theme_get_setting('btn_style'),
+			'#options' => array(
+						'btn-default' => t('Round Style'),
+						'btn-curve' => t('Curve Style'),
+				),
+		);
+
+  // HEADER SETTINGS
+	$form['header_settings'] = array(
+		'#type' => 'details',
+		'#title' => t('Header'),
+		'#group' => 'martis_settings',
+	);
+	// HEADER OPTIONS
+    $form['header_settings']['header_option'] = array(
+      '#type' => 'fieldset',
+	  '#title' => t('Header Settings'),
+    );
+	
+		// HEADER STYLE
+		$form['header_settings']['header_option']['header_style'] = array(
+			'#title' => t('Header Style'),
+			'#default_value' => theme_get_setting('header_style'),
+			'#type' => 'select',
+			'#options' => array(
+						'header-default' => t('Header Default'),
+						'header-style2' => t('Header Style 2'),
+						'header-style3' => t('Header Style 3'),
+						'header-style3 header-style4' => t('Header Style 4'),
+						'header-style3 header-style5' => t('Header Style 5'),
+						'header-style6' => t('Header Style 6'),
+				),
+		);
+		// STICKY HEADER
+		$form['header_settings']['header_option']['sticky_header'] = array(
+			'#title' => t('Sticky Header Menu'),
+			'#default_value' => theme_get_setting('sticky_header'),
+			'#type' => 'select',
+			'#options' => array(
+						'sticky-header' => t('Enable'),
+						'non-sticky-header' => t('Disable'),
+				),
+		);
+		
+		// NAV ALIGN
+		$form['header_settings']['header_option']['nav_align'] = array(
+			'#title' => t('Header Menu Position'),
+			'#default_value' => theme_get_setting('nav_align'),
+			'#type' => 'select',
+			'#options' => array(
+						'nav-left' => t('Left (Default)'),
+						'nav-center' => t('Center'),
+						'nav-right' => t('Right')
+				),
+		);
+
+		// HEADER TOP COLOR OPTIONS
+		$form['header_settings']['header_option']['header_top_theme'] = array(
+			'#title' => t('Header Top Text Color Scheme'),
+			'#default_value' => theme_get_setting('header_top_theme'),
+			'#type' => 'select',
+			'#options' => array(
+						'dark-header-top' => t('Dark'),
+						'light-header-top text-light' => t('Light'),
+				),
+		);
+		
+		// PAGE TITLE STYLE OPTIONS
+		$form['header_settings']['header_option']['page_title_style'] = array(
+			'#title' => t('Page Title Style'),
+			'#default_value' => theme_get_setting('page_title_style'),
+			'#type' => 'select',
+			'#options' => array(
+						'page-title1' => t('Style 1 (Default)'),
+						'page-title2' => t('Style 2'),
+				),
+		);
+		
+		// PAGE TITLE COLOR OPTIONS
+		$form['header_settings']['header_option']['page_title_theme'] = array(
+			'#title' => t('Page Title Color Scheme'),
+			'#default_value' => theme_get_setting('page_title_theme'),
+			'#type' => 'select',
+			'#options' => array(
+						'dark-page-title' => t('Dark'),
+						'light-page-title text-light' => t('Light'),
+				),
+		);
+		
+	// FOOTER SETTINGS
+	$form['footer_settings'] = array(
+		'#type' => 'details',
+		'#title' => t('Footer'),
+		'#group' => 'martis_settings',
+	);
+	
+	// FOOTER COLOR OPTIONS
+    $form['footer_settings']['footer_color'] = array(
+      '#type' => 'fieldset',
+	  '#title' => t('footer Text Color Scheme'),
+    );	
+	
+		$form['footer_settings']['footer_color']['footer_theme'] = array(
+			'#title' => t('Select footer Text Color Scheme'),
+			'#default_value' => theme_get_setting('footer_theme'),
+			'#type' => 'select',
+			'#options' => array(
+						'dark-footer' => t('Dark'),
+						'light-footer text-light' => t('Light'),
+				),
+		);
+
+	// FOOTER SIZE OPTIONS
+    $form['footer_settings']['footer_size'] = array(
+      '#type' => 'fieldset',
+	  '#title' => t('footer Size'),
+    );	
+	
+	// FOOTER SIZE
+    $form['footer_settings']['footer_size']['footer_first_size'] = array(
+        '#title' => t('Footer First Size'),
+        '#default_value' => theme_get_setting('footer_first_size'),
+		'#type' => 'select',
+		'#options' => array(
+					'col-md-12' => t('col-md-12'),
+					'col-md-10' => t('col-md-10'),
+					'col-md-9' => t('col-md-9'),
+					'col-md-8' => t('col-md-8'),
+					'col-md-7' => t('col-md-7'),
+					'col-md-6' => t('col-md-6'),
+					'col-md-5' => t('col-md-5'),
+					'col-md-4' => t('col-md-4'),
+					'col-md-3' => t('col-md-3'),
+					'col-md-2' => t('col-md-2'),
+			),
+    );
+	// FOOTER SIZE
+    $form['footer_settings']['footer_size']['footer_second_size'] = array(
+        '#title' => t('Footer Second Size'),
+        '#default_value' => theme_get_setting('footer_second_size'),
+		'#type' => 'select',
+		'#options' => array(
+					'col-md-12' => t('col-md-12'),
+					'col-md-10' => t('col-md-10'),
+					'col-md-9' => t('col-md-9'),
+					'col-md-8' => t('col-md-8'),
+					'col-md-7' => t('col-md-7'),
+					'col-md-6' => t('col-md-6'),
+					'col-md-5' => t('col-md-5'),
+					'col-md-4' => t('col-md-4'),
+					'col-md-3' => t('col-md-3'),
+					'col-md-2' => t('col-md-2'),
+			),
+    );
+	// FOOTER SIZE
+    $form['footer_settings']['footer_size']['footer_third_size'] = array(
+        '#title' => t('Footer Third Size'),
+        '#default_value' => theme_get_setting('footer_third_size'),
+		'#type' => 'select',
+		'#options' => array(
+					'col-md-12' => t('col-md-12'),
+					'col-md-10' => t('col-md-10'),
+					'col-md-9' => t('col-md-9'),
+					'col-md-8' => t('col-md-8'),
+					'col-md-7' => t('col-md-7'),
+					'col-md-6' => t('col-md-6'),
+					'col-md-5' => t('col-md-5'),
+					'col-md-4' => t('col-md-4'),
+					'col-md-3' => t('col-md-3'),
+					'col-md-2' => t('col-md-2'),
+			),
+    );
+	// FOOTER SIZE
+    $form['footer_settings']['footer_size']['footer_forth_size'] = array(
+        '#title' => t('Footer Forth Size'),
+        '#default_value' => theme_get_setting('footer_forth_size'),
+		'#type' => 'select',
+		'#options' => array(
+					'col-md-12' => t('col-md-12'),
+					'col-md-10' => t('col-md-10'),
+					'col-md-9' => t('col-md-9'),
+					'col-md-8' => t('col-md-8'),
+					'col-md-7' => t('col-md-7'),
+					'col-md-6' => t('col-md-6'),
+					'col-md-5' => t('col-md-5'),
+					'col-md-4' => t('col-md-4'),
+					'col-md-3' => t('col-md-3'),
+					'col-md-2' => t('col-md-2'),
+			),
+    );
+	// FOOTER SIZE
+    $form['footer_settings']['footer_size']['footer_fifth_size'] = array(
+        '#title' => t('Footer Fifth Size'),
+        '#default_value' => theme_get_setting('footer_fifth_size'),
+		'#type' => 'select',
+		'#options' => array(
+					'col-md-12' => t('col-md-12'),
+					'col-md-10' => t('col-md-10'),
+					'col-md-9' => t('col-md-9'),
+					'col-md-8' => t('col-md-8'),
+					'col-md-7' => t('col-md-7'),
+					'col-md-6' => t('col-md-6'),
+					'col-md-5' => t('col-md-5'),
+					'col-md-4' => t('col-md-4'),
+					'col-md-3' => t('col-md-3'),
+					'col-md-2' => t('col-md-2'),
+			),
+    );
+	// FOOTER SIZE
+    $form['footer_settings']['footer_size']['footer_sixth_size'] = array(
+        '#title' => t('Footer Sixth Size'),
+        '#default_value' => theme_get_setting('footer_sixth_size'),
+		'#type' => 'select',
+		'#options' => array(
+					'col-md-12' => t('col-md-12'),
+					'col-md-10' => t('col-md-10'),
+					'col-md-9' => t('col-md-9'),
+					'col-md-8' => t('col-md-8'),
+					'col-md-7' => t('col-md-7'),
+					'col-md-6' => t('col-md-6'),
+					'col-md-5' => t('col-md-5'),
+					'col-md-4' => t('col-md-4'),
+					'col-md-3' => t('col-md-3'),
+					'col-md-2' => t('col-md-2'),
+			),
+    );
+
+	// PRODUCT LAYOUT
+	$form['commerce'] = array(
+		'#type' => 'details',
+		'#title' => t('Commerce'),
+		'#group' => 'martis_settings',
+	);
+	
+			
+	// HEADER CART ICON COLOR OPTIONS
+	$form['commerce']['header_option']['cart_icon_theme'] = array(
+		'#title' => t('Header Cart Icon Color Scheme'),
+		'#default_value' => theme_get_setting('cart_icon_theme'),
+		'#type' => 'select',
+		'#options' => array(
+					'dark-cart_icon' => t('Dark'),
+					'light-cart_icon' => t('Light'),
+			),
+	);
+	
+	// PRODUCT ATTRIBUTES DISPLAY
+    $form['commerce']['product_teaser_attribute'] = array(
+        '#type' => 'select',
+        '#title' => t('Show/Hide Product Teaser Variation Attribute'),
+        '#default_value' => theme_get_setting('product_teaser_attribute'),
+		'#options' => array(
+					'product-teaser-attribute' => t('Show Variation Attribute'),
+					'product-teaser-no-attribute' => t('Hide Variation Attribute'),
+			),
+    );
+	
+	// PRODUCT IMAGE DISPLAY
+	$form['commerce']['product_image_effect'] = array(
+        '#type' => 'select',
+        '#title' => t('Product Page Image Effect'),
+        '#default_value' => theme_get_setting('product_image_effect'),
+		'#options' => array(
+					'product-image-default' => t('None'),
+					'product-image-zoom' => t('Zoom'),
+					'product-image-colorbox' => t('Colorbox'),					
+			),
+    );
+		
+	// STYLE SETTING
+	$form['style_settings'] = array(
+		'#type' => 'details',
+		'#title' => t('CSS'),
+		'#group' => 'martis_settings',
+	);
+	
+   // CUSTOM CSS
+	$form['style_settings']['custom_css'] = array(
+		'#type' => 'textarea',
+		'#title' => t('Add Custom CSS'),
+		'#description'   => t('<strong>EXAMPLE:</strong><br/>.menu a { color: #222; text-transform: uppercase; } '),
+		'#default_value' => theme_get_setting('custom_css'),
+	);
+	
+}

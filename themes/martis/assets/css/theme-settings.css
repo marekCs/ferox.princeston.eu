@@ -1,0 +1,236 @@
+
+body {
+	background: #f9f9f9;
+}
+.system-theme-settings .form-type--vertical-tabs {
+	margin: 0;
+}
+.system-theme-settings {
+	font-family: Inter,Open Sans,Helvetica Neue,sans-serif;
+}
+.system-theme-settings .vertical-tabs {
+	position: relative;
+	background-color: transparent;
+}
+.system-theme-settings .vertical-tabs:after {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 1px;
+	background-color: #121623;
+}
+.system-theme-settings .vertical-tabs__menu {
+	width: 260px;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+.system-theme-settings .vertical-tabs .vertical-tabs__panes {
+	margin-left: 260px;
+}
+.system-theme-settings .vertical-tabs__menu,
+.system-theme-settings .vertical-tabs__menu-link {
+	color: #6e778a;	
+	font-size: 14px;
+}
+.system-theme-settings .vertical-tabs__menu-link {
+	padding: 7px 30px;
+}
+.system-theme-settings .vertical-tabs__menu-link span {
+	display: inline-block;
+	transition: all .25s ease-in-out;
+}
+
+.system-theme-settings .vertical-tabs__menu-item:before,
+.system-theme-settings .vertical-tabs__menu-item:after {
+	/*border-color: #1b1d26;*/
+	border-color: transparent;
+}
+.system-theme-settings .vertical-tabs__menu-link:hover {
+	color: #ffffff;
+}
+.system-theme-settings .vertical-tabs__menu-link:hover:before {
+	background: none;
+}
+.system-theme-settings .vertical-tabs__menu-link:focus:after {
+	border: none;
+	border-radius: 0;
+}
+.system-theme-settings .vertical-tabs__menu-item.is-selected .vertical-tabs__menu-link {
+	color: #ffffff;
+	border-color: transparent;
+	background-color: #121623;
+	box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+.vertical-tabs__menu-item.is-selected .vertical-tabs__menu-link:before {
+	border-left: 3px solid #003ecc;
+	border-radius: 0;
+}
+
+.system-theme-settings .vertical-tabs__menu-link .vertical-tabs__menu-item-title {
+	font-weight: 500;
+}
+.system-theme-settings .vertical-tabs__item {
+    margin: -1px -1px 0;
+    border-radius: 0;
+}
+.system-theme-settings .vertical-tabs__items {
+	border-color: #eef0f5;
+	border-radius: 0 5px 5px 0;
+	box-shadow: none;
+}
+.system-theme-settings details.form-wrapper,
+.system-theme-settings .fieldset {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    color: #232429;
+    border: 1px solid #f7f7f7;
+    background-color: #fff;
+    box-shadow: none;
+}
+.system-theme-settings .form-element--type-select {
+	min-width: 200px;
+}
+
+.theme-setting-header {
+    display: block;
+	background: #121623;
+    color: #ffffff;
+    padding: 20px;
+    margin-bottom: 0px;
+	margin-top: 30px;
+    margin-left: 1px;
+}
+.col-half {
+	display: inline-block;
+}
+.col-half.theme-brand span {
+    border: 2px solid rgba(255, 255, 255, 0.69);
+    padding: 0px 13px;
+    margin-right: 5px;
+    background: rgba(255, 255, 255, 0.25);
+    font-size: 23px;
+}
+.col-half.theme-version {
+	background: #003ecc;
+    border-radius: 50%;
+    height: 25px;
+    width: 25px;
+    text-align: center;
+    line-height: 25px;
+    margin-left: 5px;
+    position: relative;
+    top: -10px;
+    font-size: 10px;
+}
+
+.system-theme-settings .vertical-tabs__menu-item .vertical-tabs__menu-link-content:after {
+	content: "";
+	display: block !important;
+	font-family: 'themify';
+	float: left;
+	margin-right: 10px;
+	content: "\e60f";
+}
+.system-theme-settings .vertical-tabs li:first-child .vertical-tabs__menu-link-content:after {
+	content: "\e75b";
+}
+.system-theme-settings .vertical-tabs li:nth-child(2) .vertical-tabs__menu-link-content:after {
+	content: "\e60f";
+}
+.system-theme-settings .vertical-tabs li:nth-child(3) .vertical-tabs__menu-link-content:after {
+	content: "\e62e";
+}
+.system-theme-settings .vertical-tabs li:nth-child(4) .vertical-tabs__menu-link-content:after {
+	content: "\e713";
+}
+.system-theme-settings .vertical-tabs li:nth-child(5) .vertical-tabs__menu-link-content:after {
+	content: "\e713";
+}
+.system-theme-settings .vertical-tabs li:nth-child(6) .vertical-tabs__menu-link-content:after {
+	content: "\e60d";
+}
+.system-theme-settings .vertical-tabs li:nth-child(7) .vertical-tabs__menu-link-content:after {
+	content: "\e6e0";
+}
+.system-theme-settings .vertical-tabs li:nth-child(8) .vertical-tabs__menu-link-content:after {
+	content: "\f1e0";
+}
+
+#color_scheme_form {
+    position: relative;
+	z-index: 1;
+    margin: 0;
+}
+#color_scheme_form:before {
+    content: "";
+    width: 260px;
+    height: 100%;
+    background: #121623;
+    left: 0;
+    top: 0;
+    position: absolute;
+    z-index: -1;
+}
+.color-form {
+    max-width: 53em;
+    padding-bottom: 20px;
+}
+.color-form label {
+	color: #6e778a;
+	font-weight: normal;
+	width: 200px;
+	margin-bottom: 0;
+    margin-right: 20px;
+    padding: 15px 30px;
+	margin-top: 0;
+}
+.color-form .color-palette label {
+	border: none;
+}
+.color-form .form-item {
+	margin: 0.5em 195px 0.5em 0 ;
+	padding: 0.5em 0;
+}
+.color-form .item-selected {
+	background: none;
+}
+.color-form .item-selected label {
+	color: #eaeaea;
+}
+#color_scheme_form summary {
+    margin: 0;
+	background-color: transparent !important;
+	color: #eaeaea !important;
+	max-width: 260px;
+}
+#color_scheme_form summary,
+#color_scheme_form summary *,
+#color_scheme_form summary:hover,
+#color_scheme_form summary:focus {
+	background-color: transparent !important;
+	box-shadow: none !important;
+	outline: none !important;
+}
+
+#color_scheme_form .details-wrapper {
+	margin: 0;
+}
+.color-form .form-text,
+.color-form .form-select {
+	min-width: 200px;
+}
+
+.color-form label:after {
+	font-family: 'themify';
+	margin-left: 15px;
+	content: "\e628";
+	float: right;
+}
+.help-section {
+	margin-top: 20px;
+	width: 33.3%;
+	float: left;
+}

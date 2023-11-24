@@ -1,0 +1,32 @@
+
+{%
+set classes = [
+'block',
+'block-' ~ configuration.provider|clean_class,
+'category-menu',
+]
+%}
+{% set heading_id = attributes.id|clean_id %}
+<nav aria-labelledby="{{ heading_id }}"{{ attributes|without('role', 'aria-labelledby').addClass(classes) }} {% if block_style %}style="{{ block_style }}"{% endif %}>
+	<div class="container-wrap clearfix mega-menu">
+	  {# Label. If not displayed, we still provide it for screen readers. #}
+	  {% if not configuration.label_display %}
+		{% set title_attributes = title_attributes.addClass('visually-hidden') %}
+	  {% endif %}
+	  {{ title_prefix }}
+		{% if label %}
+		<div class="block-title-wrap clearfix">
+		<div class="block-title-content">
+		<h4{{ title_attributes.addClass('block-title') }}><span class="cat-label">{{ label }}</span> <span class="cat-icon ti-menu"></span></h4>
+		{% if block_subtitle %}<h5 class="block-subtitle">{{ block_subtitle }}</h5>{% endif %}
+		</div>
+		</div>
+		{% endif %}
+	  {{ title_suffix }}
+
+	  {# Menu. #}
+	  {% block content %}
+		{{ content }}
+	  {% endblock %}
+	</div>
+</nav>

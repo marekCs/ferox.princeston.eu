@@ -1,0 +1,83 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ */
+#}
+{%
+  set classes = [
+    'node',
+    'node-type-' ~ node.bundle|clean_class,
+	'node-content',
+	'service-node-content',
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+  ]
+%}
+
+{% if view_mode =="teaser" %}
+	<div{{ attributes.addClass('feat-container service-teaser') }}>
+		{{ title_prefix }}
+		{{ title_suffix }}	
+		<div class="feat-image">
+		<div class="feat-item">
+		{% if content.field_image | render %}
+		<div class="feat-img">{{ content.field_image }}</div>
+		{% endif %}
+		
+		<div class="service-title-wrap">
+		<h4 class="service-title">{{ label }}</h4>
+		</div>
+		
+		<div class="service-content">
+		<div class="service-content-container">
+			{% if content.field_icon_image | render %}
+			<div class="feat-icon-img">{{ content.field_icon_image }}</div>
+			{% endif %}
+			<h4 class="service-title">{{ label }}</h4>
+			<div class="service-content-desc">{{ content.body }}</div>
+			<div class="post-link"><a href="{{ url }}" class="button margin-top-20">{{ 'Read More'|t }}</a></div>
+		</div>
+		</div>
+		
+		</div>
+		</div>
+	</div>
+	
+{% elseif view_mode =="teaser_2" %}
+	<div{{ attributes.addClass('feat-container service-teaser service-teaser2') }}>
+		{{ title_prefix }}
+		{{ title_suffix }}
+		{% if content.field_image | render %}
+		<div class="service-image">{{ content.field_image }}</div>
+		{% endif %}
+		<div class="post-content">
+		{% if content.field_icon_image | render %}
+		<div class="service-icon"><img src="{{ file_url(content.field_icon_image.0['#item'].entity.uri.value) }}" alt="{{ content.field_icon_image.0['#item'].alt }}"/></div>
+		{% endif %}
+		<h4><a href="{{ url }}">{{ label }}</a></h4>
+		<div class="mb-3">{{ content.body }}</div>
+		<a href="{{ url }}"><strong>{{ 'Read More'|t }}</strong></a>
+		</div>
+	</div>
+
+{% elseif view_mode =="teaser_3" %}
+	<div{{ attributes }}>
+		<div class="post-content">
+		<h4><a href="{{ url }}">{{ label }}</a></h4>
+		<div>{{ content.body }}</div>
+		</div>
+	</div>	
+	
+{% else %}
+	<div{{ attributes.addClass(classes) }}>
+		{{ title_prefix }}
+		{{ title_suffix }}
+			{% if content.field_image | render %}
+			<div class="node-service-image post-thumb">{{ content.field_image }}</div>
+			{% endif %}
+			<div class="post-content">{{ content.body }}</div>
+			{{ content|without('field_image','body','field_icon_image') }}
+	</div>
+{% endif %}

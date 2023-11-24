@@ -1,0 +1,125 @@
+.field-shuffle-display {
+  float: none;
+  width: 100%;
+}
+.grid {
+  position: relative;
+  overflow: hidden;
+}
+.grid-item {
+  height: auto;
+}
+.shuffle-item {
+  margin-bottom: 20px;
+  padding: 0 10px !important;
+}
+.shuffle-inner {
+	display: block;
+	position: relative;
+}
+.field-shuffle-display .shuffle-inner img {
+	margin: 0;
+}
+.shuffle-inner .shuffle-caption {
+	position: absolute;
+	bottom: 5px;
+	width: 100%;
+	color: #bdbdbd;
+	background-color: rgba(0, 0, 0, 0.5);
+}
+.shuffle-inner .shuffle-caption p {
+	padding: 5px 10px;
+	margin: 0;
+}
+.shuffle-filters-container .filter-label {
+	margin: 1em;
+}
+
+/*  PORTFOLIO SHUFFLE */
+.filter {
+	padding: 0;
+	display: table;
+	margin: 0;
+	width: 100%;
+	text-align: center;
+}
+.shuffle-filters {
+	margin: 0;
+	display: inline-block;
+	float: left;
+}
+.shuffle-filters li {
+	list-style: none;
+	padding: 0;
+	cursor: pointer;
+	font-weight: bold;
+	line-height: 1;
+	position: relative;
+	margin-right: 25px;
+	position: relative;
+}
+.shuffle-filters-item.active {
+	color: #1d7c89;
+}
+.shuffle-filters li,
+.shuffle-filters-container,
+.shuffle-filters .item-list {
+	display: inline-block;
+}
+.shuffle-filter-trigger {
+	display: inline-block;
+	float: left;
+	cursor: pointer;
+}
+.shuffle-icon {
+	display: block;
+	width: 40px;
+	height: 40px;
+	text-align: center;
+	line-height: 40px;
+	background-color: #333333;
+	color: #ffffff;
+	font-size: 20px;
+	-webkit-transition: all 0.7s ease-in;
+	transition: all 0.7s ease-in;
+}
+.shuffle-filters-wrap {
+	display: block;
+	margin: 0 0 40px 0;
+}
+.shuffle-container,
+.fullwidth .shuffle-container {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+.fullwidth .shuffle-filters-wrap {
+	max-width: 1190px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.block-title-center .shuffle-filters-wrap {
+	text-align: center;
+}
+.block-title-left .shuffle-filters-wrap {
+	text-align: left;
+}
+.block-title-right .shuffle-filters-wrap {
+	text-align: right;
+}
+.block-title-right .shuffle-filters-wrap .shuffle-filters li {
+	margin-left: 15px;
+	margin-right: 0;
+}
+.no-gutter {
+	padding: 0 !important;
+	margin-bottom: 0;
+}
+.no-gutter-wrapper .shuffle-container,
+.no-gutter-wrapper .shuffle-filters-wrap {
+	margin-left: 0;
+	margin-right: 0;
+}
+.title-light .shuffle-filters-item {
+	color: #f0f0f0;
+}

@@ -1,0 +1,15 @@
+# Ignorování konkrétních složek
+sites/default/files/
+sites/default/private/
+
+# Ignorování konfiguračních souborů
+sites/default/settings.php
+sites/default/settings.local.php
+
+# Ignorování dočasných souborů
+*.tmp
+*.bak
+
+# Ignorování složek s knihovnami a závislostmi
+/vendor/
+/node_modules/

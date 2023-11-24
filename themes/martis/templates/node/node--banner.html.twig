@@ -1,0 +1,59 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ */
+#}
+{%
+  set classes = [
+    'node',
+    'node-type-' ~ node.bundle|clean_class,
+	'node-content',
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+  ]
+%}
+
+{% if teaser %}
+<div{{ attributes.addClass('promotion-item') }}>
+  {{ title_prefix }}
+  {{ title_suffix }}
+	<div class="promotion-container {{ node.field_text_color.value }}">
+		<div class="promotion-image">{{ content.field_image }}</div>
+		<div class="promotion-meta-wrap">
+		<div class="promotion-meta {{ node.field_content_placement.value }} {{ node.field_text_align.value }}">
+		<div class="promotion-content-meta">
+		{% if content.field_heading_text | render %}
+		<div class="promotion-title clearfix">{{ content.field_heading_text }}</div>
+		{% endif %}
+		{% if content.body | render %}
+		<div class="promotion-content">{{ content.body }}</div>	
+		{% endif %}
+		{% if node.field_link.title | render %}
+			<div class="nav menu alt-button mt-2 promotion-link">
+			<a href="{{ content.field_link.0['#url'] }}" class="button promotion-button">{{ content.field_link.0['#title'] }}</a>
+			</div>	
+		{% endif %}
+		</div>
+		</div>
+		</div>
+		
+		{% if node.field_make_content_link.value and content.field_link | render %}
+		<a class="slide-content-link" href="{{ content.field_link.0['#url'] }}">view</a>
+		{% endif %}
+		
+	</div>
+</div>
+{% else %}
+<div{{ attributes.addClass(classes) }}>
+  {{ title_prefix }}
+  {{ title_suffix }}
+	{% if content.field_image | render %}
+	<div class="node-feat-image">{{ content.field_image }}</div>
+	{% endif %}
+	<div class="post-content">
+	{{ content.body }}
+	</div>
+</div>
+{% endif %}

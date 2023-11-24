@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 480x560
+label: 480x560
+effects:
+  2a426484-fa0f-4d4a-ad67-a6267a036873:
+    uuid: 2a426484-fa0f-4d4a-ad67-a6267a036873
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 480
+      height: 560
+      anchor: center-center

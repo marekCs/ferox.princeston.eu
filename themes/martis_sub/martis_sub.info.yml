@@ -1,0 +1,45 @@
+name: Martis Sub Theme
+type: theme
+description: 'Martis Drupal Responsive Sub Theme. Developed & Designed by <a href=http://www.hugestem.com>HugeStem</a>'
+package: core
+version: '1.1'
+core_version_requirement: ^8 || ^9 || ^10
+
+base theme: martis
+
+#Libraries
+libraries:
+  - martis_sub/global
+
+#Regions
+regions:
+  header_top_first: 'Header Top First'
+  header_top_second: 'Header Top Second'
+  branding: 'Branding'
+  header: 'Header'
+  header_search: 'Header Search'
+  header_right: 'Header Right'
+  header_cart: 'Header Cart'
+  header_category_menu: 'Header Category Menu'
+  main_menu_left: 'Main Menu Left'
+  main_menu: 'Main Menu'
+  main_menu_right: 'Main Menu Right'
+  page_title: 'Page Title'
+  breadcrumb: 'Breadcrumb'
+  content_wide_top: 'Content Wide Top'
+  content: 'Content'
+  sidebar_first: 'Left Sidebar'
+  sidebar_second: 'Right Sidebar'
+  content_wide: 'Content Wide Bottom'
+  content_widget_first: 'Content Widget First'
+  content_widget_second: 'Content Widget Second'
+  content_widget_third: 'Content Widget Third'
+  footer_first: 'Footer First Widget'
+  footer_second: 'Footer Second Widget'
+  footer_third: 'Footer Third Widget'
+  footer_forth: 'Footer Forth Widget'
+  footer_fifth: 'Footer Fifth Widget'
+  footer_sixth: 'Footer Sixth Widget'
+  footer_bottom_first: 'Footer Bottom First'
+  footer_bottom_second: 'Footer Bottom Second'
+  hidden_blocks: 'Hidden blocks'

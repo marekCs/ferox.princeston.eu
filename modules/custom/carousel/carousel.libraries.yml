@@ -1,0 +1,12 @@
+owl-carousel:
+  css:
+    theme:
+      css/carousel.css: {}
+  js:
+    js/carousel.js: {}
+  dependencies:
+    - martis/owl-carousel
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/jquery.once

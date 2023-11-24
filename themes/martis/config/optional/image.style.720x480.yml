@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 720x480
+label: 720x480
+effects:
+  14d0c6b6-68cb-415c-b1fa-8488ee29add8:
+    uuid: 14d0c6b6-68cb-415c-b1fa-8488ee29add8
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 720
+      height: 480
+      anchor: center-center

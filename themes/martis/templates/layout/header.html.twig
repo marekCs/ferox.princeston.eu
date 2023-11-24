@@ -1,0 +1,114 @@
+{# @martis theme header #}
+
+<!-- Header Start -->
+<header class="header">
+	{% if page.header_top_first or page.header_top_second %}
+	<div class="header-top {{ header_top_theme }}">
+		<div class="container">
+			<div class="row">	
+			<div class="col-md-6">
+				{% if page.header_top_first %}
+				<div class="header-top-first">
+				{{ page.header_top_first }}
+				</div>
+				{% endif %}
+			</div>
+			<div class="col-md-6">
+				{% if page.header_top_second %}
+				<div class="header-top-second">
+				{{ page.header_top_second }}
+				</div>
+			{% endif %}
+			</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}
+		
+	<div class="container-wrap header-wrap">
+		{% if page.branding or page.header or page.header_search or page.header_right or page.main_menu or page.header_cart %}
+		<div class="navbar header-center">
+			<div class="container">
+				{% if page.branding %}
+				<div class="header-side navbar-brand">
+					{{ page.branding }}
+				</div>
+				{% endif %}
+				{% if page.header or page.header_search %}
+				<div class="header-main-wrap">
+					{% if page.header %}
+					<div class="header-item header-main">
+					{{ page.header }}
+					</div>
+					{% endif %}
+
+					{% if page.header_search %}
+					<div id="header-search" class="collapse header-item header-search">
+					{{ page.header_search }}
+					</div>
+					{% endif %}
+				</div>
+				{% endif %}
+				{% if page.header_right or page.main_menu or page.header_cart %}
+				<div class="header-side header-right-wrap">
+					{% if page.header_right %}
+					<div class="header-item header-right">
+						{{ page.header_right }}	
+					</div>
+					{% endif %}	
+					
+					{% if page.header_cart or page.main_menu %}
+					<div class="header-item header-element">
+					
+					{% if page.header_search %}
+					<button class="header-element-item search-button" type="button" data-toggle="collapse" data-target="#header-search" aria-expanded="false" aria-controls="header-search">
+						<i class="ti-search"></i>
+					</button>
+					{% endif %}	
+					
+					{% if page.header_cart %}
+					<div class="header-element-item header-cart {{ cart_icon_theme }}">
+						{{ page.header_cart }}
+					</div>
+					{% endif %}
+
+					{% if page.main_menu %}
+					<button class="navbar-toggler nav-button" type="button" data-toggle="collapse" data-target="#main-menu" aria-controls="main-menu" aria-expanded="false" aria-label="Toggle navigation">
+						<i class="ti-menu"></i>
+					</button>
+					{% endif %}
+					</div>
+					{% endif %}
+				</div>
+				{% endif %}
+			</div>
+		</div>
+		{% endif %}
+		
+		{% if page.main_menu or page.header_category_menu or page.main_menu_right %}
+		<div class="header-menu">
+		<div class="navbar navbar-expand-md nav-menu">
+			<div class="container p-0">
+				{% if page.header_category_menu %}
+				<div id="main-menu-left" class="{{mainmenuleftcol}} main-menu-left">
+					{{ page.header_category_menu }}
+				</div>
+				{% endif %}
+				{% if page.main_menu %}
+				<div id="main-menu" class="{{mainmenucol}} collapse navbar-collapse primary-menu {{ nav_align }}">
+					{{ page.main_menu }}
+				</div>
+				{% endif %}
+
+				{% if page.main_menu_right %}
+				<div id="main-menu-right" class="{{mainmenurightcol}} main-menu-right">
+					{{ page.main_menu_right }}
+				</div>
+				{% endif %}	
+			</div>
+		</div>
+		</div>
+		{% endif %}
+	</div>
+</header>
+<!-- Header End -->

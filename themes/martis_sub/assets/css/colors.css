@@ -1,0 +1,157 @@
+/* ---------- Color Module Styles ----------- */
+a:hover,
+a:focus,
+.mega-menu a:hover, .mega-menu a:focus, .mega-menu a:active, .mega-menu a.is-active, .mega-menu li.menu-item--active-trail > a,
+.mega-menu > ul > li > ul > li a:hover, .mega-menu > ul > li > ul > li a.is-active,
+.footer-widget a:hover,
+.tag-cloud li .tag-name a:hover,
+.messages a,
+.single-page nav .nav.menu li.active a,
+.social-icon li a:hover,
+.social-media li a:hover,
+.maintenance-icon,
+.blog-post .post-title a:hover,
+.post-meta .post-meta-item a:hover,
+.sidebar ul.menu li a.is-active,
+.number-count .grid-item:before,
+.shuffle-filters-item.active,
+.product-price,
+.commerce-checkout-flow legend,
+.facet-list .is-active .js-facet-deactivate,
+.ui-widget-content a,
+.menu-tab-wrapper .nav-tabs > li.active > a,
+.category-menu-alt .cat-icon,
+.contact-address-line i,
+.switch-icon .active,
+.list-icon i,
+.text-colored,
+.text-colored *,
+.colored-text,
+.colored-text * {
+    color: #2ba9e0;
+}
+
+.btn,
+.button,
+.btn-primary,
+input[type="submit"],
+.search-content input[type="submit"],
+.colored-bg,
+.preloader-spinner,
+.tag-cloud li a:hover,
+.pager li > a:hover,
+.pager li.is-active a,
+.pager li.pager__item.is-active > a,
+#page-title.title-colored-bg,
+.panel-heading.colored .panel-title > a, 
+.panel-heading.colored .panel-title > a.collapsed:hover, 
+.panel-heading.colored .panel-title > a:hover, 
+.panel-heading.colored .panel-title > a.collapsed,
+.colored-footer .footer-widget,
+.colored-footer .footer-bottom,
+.feature-block .feat:hover,
+.feat-block-video .colorbox .video-link,
+.service-teaser2:hover .service-icon,
+.dark-scheme .pricing-table .featured .pricing-wrap,
+.progress-bar-wrap,
+.owl-carousel .owl-nav button:hover,
+.sidebar .service-menu ul.menu a.is-active,
+.button-cta,
+.cart-block-link a,
+.cart-block--summary__count,
+.product-featured-text,
+.product-teaser .product-icon .action-unflag i,
+.product-category-icon:hover,
+.category-menu .block-title-wrap,
+.grid-menu-item .menu-price-amount,
+.team-thumb .team-social,
+.contact-social.social-media ul li a,
+[type="radio"]:checked + span + label:after,
+[type="radio"]:checked + label:after,
+[type="checkbox"]:checked + label:after {
+    background-color: #2ba9e0;
+}
+
+.btn-primary,
+.pager li > a:hover,
+.pager li.is-active a,
+.pager li.pager__item.is-active > a,
+.menu-dropdown > a.is-active:after,
+.menu-dropdown > a:hover:after,
+.menu-item--active-trail.menu-dropdown > a:after,
+.tag-cloud li a:hover,
+.search-block-form input[type="submit"],
+.search-form input[type="submit"],
+.social-icon li a:hover,
+.team-thumb .team-social,
+.feat-block-video .colorbox:after,
+.feat-block-video .colorbox:before,
+blockquote,
+.product--rendered-attribute__selected ~ label.option .color_field__swatch,
+.product--rendered-attribute label.option:hover .product-attribute,
+.product--rendered-attribute__selected ~ label.option .product-attribute,
+.product-category-icon:hover,
+[type="radio"]:checked + span + label:before,
+[type="radio"]:checked + span + label:after,
+[type="radio"]:checked + label:before,
+[type="radio"]:checked + label:after,
+[type="checkbox"]:checked + label:after {
+	border-color: #2ba9e0;
+}
+
+body {
+  color: #555555;
+}
+
+body {
+  background-color: #f9f9f9;
+}
+
+.wrapper .layout-wrap {
+	background-color: #ffffff;
+}
+
+.header {
+	background-color: #fcfcfc;
+}
+
+.header-top {
+	background-color: #f8f8f8;
+}
+
+.header-menu .nav-menu {
+	background-color: #19212e;
+}
+
+.mega-menu > ul > li > a,
+.main-menu .nav > li > a,
+.main-menu-left,
+.main-menu-right * {
+	color: #fefefe;
+}
+
+.main-menu .mega-menu > ul > li > a:hover,
+.main-menu .mega-menu > ul > li > a.is-active,
+.main-menu .mega-menu > ul > li.menu-item--active-trail > a {
+	color: #49c3f9;
+}
+
+.main-menu .menu-dropdown > a.is-active:after,
+.main-menu .menu-dropdown > a:hover:after,
+.main-menu .menu-item--active-trail.menu-dropdown > a:after {
+	border-color: #49c3f9;
+}
+
+.menu-dropdown > a:after,
+.header-style3 .mega-menu > ul > li > a:before,
+.header-menu .nav-menu:before {
+	border-color: #fefefe;
+}
+
+#page-title {
+	background-color: #f7f7f7;
+}
+
+.footer {
+	background-color: #19212c;
+}

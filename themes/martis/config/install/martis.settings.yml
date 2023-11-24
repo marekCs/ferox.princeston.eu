@@ -1,0 +1,29 @@
+features:
+  comment_user_picture: true
+  comment_user_verification: true
+  favicon: true
+  logo: true
+  name: false
+  node_user_picture: true
+  slogan: false
+preloader: 1
+scrolltop: 1
+site_layout: standard-layout
+nav_align: nav-left
+sticky_header: non-sticky-header
+footer_theme: 'light-footer text-light'
+site_style: square-style
+rtl: 0
+header_style: header-default
+footer_first_size: col-md-4
+footer_second_size: col-md-2
+footer_third_size: col-md-2
+footer_forth_size: col-md-2
+footer_fifth_size: col-md-2
+footer_sixth_size: col-md-12
+product_teaser_attribute: product-teaser-attribute
+header_top_theme: dark-header-top
+custom_css: ''
+page_title_style: page-title1
+page_title_theme: dark-page-title
+cart_icon_theme: dark-cart_icon
