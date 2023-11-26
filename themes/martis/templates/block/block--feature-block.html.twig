@@ -120,11 +120,9 @@
 	{% if content.field_media_format['#items'].getValue()|first.value == "static-image" %}
 	<div class="feat-block-image">{{ content.field_image }}</div>
 	{% elseif content.field_media_format['#items'].getValue()|first.value == "slider-image" %}
-	<div class="feat-block-image feat-block-slide">
 		<div class="slide-carousel owl-carousel" data-nav="false" data-items="1" data-dots="true" data-autoplay="true" data-loop="true">
 		{{ content.field_image }}
 		</div>
-	</div>
 	{% elseif content.field_media_format['#items'].getValue()|first.value == "video-popup" %}
 	<div class="feat-block-image feat-block-video" style="background-image: url({{ file_url(content.field_image.0['#item'].entity.uri.value) }});">
 		<div class="feat-block-image-bg">{{ content.field_image }}</div>

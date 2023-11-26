@@ -1,3 +1,9 @@
-.language-switcher-locale-url .language-link > span {
-  display: none;
+/* Skryje text jazyka, ale ponechá vlajky */
+.lang-dropdown-select-element .nice-select .current {
+  display: none; /* Skryje text jazyka */
+}
+
+/* Zajistí, že vlajka zůstane viditelná */
+.language-icon {
+  display: inline-block; /* Zobrazí vlajku */
 }
