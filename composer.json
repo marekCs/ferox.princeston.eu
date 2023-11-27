@@ -36,7 +36,8 @@
         "drupal/photoswipe": "^4.0.1",
         "drupal/redirect": "^1.9",
         "drupal/simplenews": "^3.0@beta",
-        "drupal/svg_image_field": "^2.3.1"
+        "drupal/svg_image_field": "^2.3.1",
+        "drupal/weight": "3.4"
     },
     "conflict": {
         "drupal/drupal": "*"
