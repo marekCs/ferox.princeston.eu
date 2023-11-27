@@ -29,6 +29,7 @@ class SimplenewsSynchronizeFieldsTest extends KernelTestBase {
     parent::setUp();
     $this->installEntitySchema('user');
     $this->installEntitySchema('simplenews_subscriber');
+    $this->installEntitySchema('simplenews_subscriber_history');
     $this->installSchema('system', ['sequences', 'sessions']);
     $this->config('system.mail')->set('interface.default', 'test_mail_collector')->save();
     $this->config('simplenews.settings')
@@ -61,7 +62,7 @@ class SimplenewsSynchronizeFieldsTest extends KernelTestBase {
     $subscriber = Subscriber::load($subscriber->id());
     $this->assertEquals($user->id(), $subscriber->getUserId());
     $this->assertEquals('fr', $subscriber->getLangcode());
-    $this->assertFalse($subscriber->getStatus());
+    $this->assertFalse($subscriber->isActive());
 
     // Update user fields.
     $user->setEmail('user2@example.com');
@@ -73,14 +74,14 @@ class SimplenewsSynchronizeFieldsTest extends KernelTestBase {
     $subscriber = Subscriber::load($subscriber->id());
     $this->assertEquals('user2@example.com', $subscriber->getMail());
     $this->assertEquals('en', $subscriber->getLangcode());
-    $this->assertTrue($subscriber->getStatus());
+    $this->assertTrue($subscriber->isActive());
 
     // Status is still synced even if sync_fields is not set.
     $this->config('simplenews.settings')->set('subscriber.sync_fields', FALSE)->save();
     $user->block();
     $user->save();
     $subscriber = Subscriber::load($subscriber->id());
-    $this->assertFalse($subscriber->getStatus());
+    $this->assertFalse($subscriber->isActive());
   }
 
   /**

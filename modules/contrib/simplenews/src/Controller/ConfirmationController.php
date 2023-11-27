@@ -4,6 +4,7 @@ namespace Drupal\simplenews\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
+use Drupal\simplenews\SubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\simplenews\Entity\Subscriber;
 use Drupal\simplenews\Entity\Newsletter;
@@ -42,10 +43,10 @@ class ConfirmationController extends ControllerBase {
   }
 
   /**
-   * Menu callback: confirm a combined confirmation request.
+   * Menu callback: confirm a subscribe request.
    *
    * This function is called by clicking the confirm link in the confirmation
-   * email. It handles both subscription addition and subscription removal.
+   * email. It acts on an existing unconfirmed subscriber to make it confirmed.
    *
    * @param int $snid
    *   The subscriber id.
@@ -59,7 +60,7 @@ class ConfirmationController extends ControllerBase {
    * @see simplenews_confirm_add_form()
    * @see simplenews_confirm_removal_form()
    */
-  public function confirmCombined($snid, $timestamp, $hash, $immediate = FALSE) {
+  public function confirmSubscribe($snid, $timestamp, $hash, $immediate = FALSE) {
     $config = $this->config('simplenews.settings');
 
     // Prevent search engines from indexing this page.
@@ -76,20 +77,14 @@ class ConfirmationController extends ControllerBase {
 
     $subscriber = Subscriber::load($snid);
 
-    // Redirect and display message if no changes are available.
-    if ($subscriber && !$subscriber->getChanges()) {
-      $this->messenger()->addMessage($this->t('All changes to your subscriptions were already applied. No changes made.'));
-      return $this->redirect('<front>');
-    }
-
-    if ($subscriber && $hash == simplenews_generate_hash($subscriber->getMail(), 'combined' . serialize($subscriber->getChanges()), $timestamp)) {
+    if ($subscriber && $hash == simplenews_generate_hash($subscriber->getMail(), 'confirm', $timestamp)) {
       // If the hash is valid but timestamp is too old, display form to request
       // a new hash.
       if ($timestamp < \Drupal::time()->getRequestTime() - $config->get('hash_expiration')) {
         $context = [
           'simplenews_subscriber' => $subscriber,
         ];
-        $build = $this->formBuilder()->getForm('\Drupal\simplenews\Form\RequestHashForm', 'subscribe_combined', $context);
+        $build = $this->formBuilder()->getForm('\Drupal\simplenews\Form\RequestHashForm', 'confirm', $context);
         $build['#attached']['html_head'][] = $html_head;
         return $build;
       }
@@ -101,51 +96,22 @@ class ConfirmationController extends ControllerBase {
         return $build;
       }
       else {
-
-        // Redirect and display message if no changes are available.
-        foreach ($subscriber->getChanges() as $newsletter_id => $action) {
-          if ($action == 'subscribe') {
-            $this->subscriptionManager->subscribe($subscriber->getMail(), $newsletter_id, FALSE, 'website');
-          }
-          elseif ($action == 'unsubscribe') {
-            $this->subscriptionManager->unsubscribe($subscriber->getMail(), $newsletter_id, FALSE, 'website');
-          }
-        }
-
-        // Clear changes.
-        $subscriber->setChanges([]);
-        $subscriber->save();
-
         $this->messenger()->addMessage($this->t('Subscription changes confirmed for %user.', ['%user' => $subscriber->getMail()]));
+        $subscriber->setStatus(SubscriberInterface::ACTIVE)->save();
         return $this->redirect('<front>');
       }
     }
+
     throw new NotFoundHttpException();
   }
 
   /**
-   * Menu callback: confirm the user's (un)subscription request.
+   * Menu callback: handle add/remove subscription request.
    *
-   * This function is called by clicking the confirm link in the confirmation
-   * email or the unsubscribe link in the footer of the newsletter. It handles
-   * both subscription addition and subscription removal.
-   *
-   * Calling URLs are:
-   * newsletter/confirm/add
-   * newsletter/confirm/add/$HASH
-   * newsletter/confirm/remove
-   * newsletter/confirm/remove/$HASH
-   *
-   * @see simplenews_confirm_add_form()
-   * @see simplenews_confirm_removal_form()
-   */
-
-  /**
-   * Menu callback: confirm the user's (un)subscription request.
-   *
-   * This function is called by clicking the confirm link in the confirmation
-   * email or the unsubscribe link in the footer of the newsletter. It handles
-   * both subscription addition and subscription removal.
+   * This function is called by clicking a link from a subscribe token
+   * (subscribe-url or unsubscribe-url). It acts on an existing confirmed
+   * subscriber to add or remove a single newsletter subscription. The most
+   * common case is the unsubscribe link in the footer of the newsletter.
    *
    * @param string $action
    *   Either add or remove.
@@ -159,11 +125,8 @@ class ConfirmationController extends ControllerBase {
    *   The confirmation hash.
    * @param bool $immediate
    *   Perform the action immediately if TRUE.
-   *
-   * @see simplenews_confirm_add_form()
-   * @see simplenews_confirm_removal_form()
    */
-  public function confirmSubscription($action, $snid, $newsletter_id, $timestamp, $hash, $immediate = FALSE) {
+  public function handleSubscription($action, $snid, $newsletter_id, $timestamp, $hash, $immediate = FALSE) {
     $config = $this->config('simplenews.settings');
 
     // Prevent search engines from indexing this page.
@@ -189,30 +152,21 @@ class ConfirmationController extends ControllerBase {
           'simplenews_subscriber' => $subscriber,
           'newsletter' => $newsletter,
         ];
-        $key = $action == 'add' ? 'subscribe_combined' : 'validate';
-        $build = $this->formBuilder()->getForm('\Drupal\simplenews\Form\RequestHashForm', $key, $context);
+        $build = $this->formBuilder()->getForm('\Drupal\simplenews\Form\RequestHashForm', 'validate', $context);
         $build['#attached']['html_head'][] = $html_head;
         return $build;
       }
-      // When called with additional arguments the user will be directed to the
-      // (un)subscribe confirmation page. The additional arguments will be
-      // passed on to the confirmation page.
+
+      // Build the (un)subscribe confirmation form.
       if (!$immediate) {
-        if ($action == 'remove') {
-          $build = $this->formBuilder()->getForm('\Drupal\simplenews\Form\ConfirmRemovalForm', $subscriber->getMail(), $newsletter);
-          $build['#attached']['html_head'][] = $html_head;
-          return $build;
-        }
-        elseif ($action == 'add') {
-          $build = $this->formBuilder()->getForm('\Drupal\simplenews\Form\ConfirmAddForm', $subscriber->getMail(), $newsletter);
-          $build['#attached']['html_head'][] = $html_head;
-          return $build;
-        }
+        $form = ($action == 'remove') ? '\Drupal\simplenews\Form\ConfirmRemovalForm' : '\Drupal\simplenews\Form\ConfirmAddForm';
+        $build = $this->formBuilder()->getForm($form, $subscriber, $newsletter);
+        $build['#attached']['html_head'][] = $html_head;
+        return $build;
       }
       else {
-
         if ($action == 'remove') {
-          $this->subscriptionManager->unsubscribe($subscriber->getMail(), $newsletter_id, FALSE, 'website');
+          $subscriber->unsubscribe($newsletter_id)->save();
           if ($path = $config->get('subscription.confirm_unsubscribe_page')) {
             $url = Url::fromUri("internal:$path");
             return $this->redirect($url->getRouteName(), $url->getRouteParameters());
@@ -221,7 +175,7 @@ class ConfirmationController extends ControllerBase {
           return $this->redirect('<front>');
         }
         elseif ($action == 'add') {
-          $this->subscriptionManager->subscribe($subscriber->getMail(), $newsletter_id, FALSE, 'website');
+          $subscriber->subscribe($newsletter_id)->save();
           if ($path = $config->get('subscription.confirm_subscribe_page')) {
             $url = Url::fromUri("internal:$path");
             return $this->redirect($url->getRouteName(), $url->getRouteParameters());
@@ -232,24 +186,6 @@ class ConfirmationController extends ControllerBase {
       }
     }
     throw new NotFoundHttpException();
-  }
-
-  /**
-   * Redirects subscribers to the appropriate page.
-   *
-   * Redirect to the 'Newsletters' tab for authenticated users or the 'Access
-   * your subscriptions' page otherwise.
-   *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
-   *   Returns a redirect to the correct page.
-   */
-  public function subscriptionsPage() {
-    $user = $this->currentUser();
-
-    if ($user->isAuthenticated()) {
-      return $this->redirect('simplenews.newsletter_subscriptions_user', ['user' => $user->id()]);
-    }
-    return $this->redirect('simplenews.newsletter_validate');
   }
 
 }

@@ -39,6 +39,13 @@ abstract class SimplenewsTestBase extends BrowserTestBase {
   protected $config;
 
   /**
+   * Array of email addresses of test subscribers.
+   *
+   * @var string[]
+   */
+  protected $subscribers;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -62,9 +69,9 @@ abstract class SimplenewsTestBase extends BrowserTestBase {
    * Generates a random email address.
    *
    * The generated addresses are stored in a class variable. Each generated
-   * adress is checked against this store to prevent duplicates.
+   * address is checked against this store to prevent duplicates.
    *
-   * @todo: Make this function redundant by modification of Simplenews.
+   * @todo Make this function redundant by modification of Simplenews.
    * Email addresses are case sensitive, simplenews system should handle with
    * this correctly.
    */
@@ -132,7 +139,7 @@ abstract class SimplenewsTestBase extends BrowserTestBase {
     $this->clickLink(t('Mass subscribe'));
     $edit = [
       'emails' => implode(',', $this->subscribers),
-      // @todo: Don't hardcode the default newsletter_id.
+      // @todo Don't hardcode the default newsletter_id.
       'newsletters[' . $newsletter_id . ']' => TRUE,
     ];
     $this->submitForm($edit, 'Subscribe');
@@ -269,7 +276,7 @@ abstract class SimplenewsTestBase extends BrowserTestBase {
    */
   protected function getLatestSubscriber() {
     $snids = \Drupal::entityQuery('simplenews_subscriber')
-      ->sort('created', 'DESC')
+      ->sort('id', 'DESC')
       ->range(0, 1)
       ->accessCheck(FALSE)
       ->execute();
@@ -308,6 +315,20 @@ abstract class SimplenewsTestBase extends BrowserTestBase {
     $body = preg_replace('/\s+/', ' ', $this->getMail($offset));
     $pos = strpos($body, (string) $needle);
     $this->assertEquals($pos !== FALSE, $exist, "$needle found in mail");
+  }
+
+  /**
+   * Extract a confirmation link from a mail body.
+   */
+  protected function extractConfirmationLink($body) {
+    $pattern = '@simplenews/.+/.+/.+/.{20,}@';
+    $found = preg_match($pattern, $body, $match);
+    if (!$found) {
+      $this->fail(t('No confirmation URL found in "@body".', ['@body' => $body]));
+      return FALSE;
+    }
+    $confirm_url = $match[0];
+    return $confirm_url;
   }
 
 }

@@ -20,6 +20,7 @@ use Drupal\user\UserInterface;
  *   label = @Translation("Simplenews subscriber"),
  *   handlers = {
  *     "storage" = "Drupal\simplenews\Subscription\SubscriptionStorage",
+ *     "storage_schema" = "Drupal\simplenews\Subscription\SubscriptionStorageSchema",
  *     "access" = "Drupal\simplenews\SubscriberAccessControlHandler",
  *     "form" = {
  *       "add" = "Drupal\simplenews\Form\SubscriberForm",
@@ -51,6 +52,18 @@ use Drupal\user\UserInterface;
 class Subscriber extends ContentEntityBase implements SubscriberInterface {
 
   /**
+   * Subscriber created during user registration.
+   *
+   * Written in simplenews_user_profile_form_submit() and read in
+   * simplenews_user_insert(). Unfortunately we have to use a static variable
+   * because there is way to link the user and subscriber: the user doesn't yet
+   * have an id, nor any field to link to a subscriber.
+   *
+   * @var \Drupal\simplenews\Entity\Subscriber
+   */
+  public static $userRegSubscriber;
+
+  /**
    * Whether currently copying field values to corresponding User.
    *
    * @var bool
@@ -60,29 +73,53 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public function getMessage() {
-    return $this->get('message')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setMessage($message) {
-    $this->set('message', $message);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getStatus() {
-    return $this->get('status')->value == SubscriberInterface::ACTIVE;
+    return $this->get('status')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStatus($status) {
-    $this->set('status', $status ? SubscriberInterface::ACTIVE : SubscriberInterface::INACTIVE);
+  public function isActive() {
+    return $this->getStatus() == self::ACTIVE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isConfirmed() {
+    return $this->getStatus() != self::UNCONFIRMED;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStatus(int $status) {
+    if (!in_array($status, [self::INACTIVE, self::ACTIVE, self::UNCONFIRMED])) {
+      throw new \LogicException('Status must be INACTIVE, ACTIVE, or UNCONFIRMED');
+    }
+
+    if ($status == self::ACTIVE && !$this->isConfirmed() && $existing = static::loadByMail($this->getMail())) {
+      // Combine with existing confirmed subscription.
+      foreach ($this->getSubscribedNewsletterIds() as $newsletter_id) {
+        $existing->subscribe($newsletter_id);
+      }
+      foreach ($this->getFieldDefinitions() as $field_definition) {
+        if (!$field_definition->getFieldStorageDefinition()->isBaseField()) {
+          $field_name = $field_definition->getName();
+          $item = $this->get($field_name);
+          if (!$item->isEmpty()) {
+            $existing->set($field_name, $item->getValue());
+          }
+        }
+      }
+      $existing->save();
+      $this->delete();
+      return $existing;
+    }
+
+    $this->set('status', $status);
+    return $this;
   }
 
   /**
@@ -95,8 +132,9 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public function setMail($mail) {
+  public function setMail(string $mail) {
     $this->set('mail', $mail);
+    return $this;
   }
 
   /**
@@ -132,14 +170,15 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public function setLangcode($langcode) {
+  public function setLangcode(string $langcode) {
     $this->set('langcode', $langcode);
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function fillFromAccount(AccountInterface $account) {
+  public function fillFromAccount(AccountInterface $account, bool $shared_fields = TRUE) {
     if (static::$syncing) {
       return $this;
     }
@@ -148,11 +187,15 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
     $this->set('uid', $account->id());
     $this->setMail($account->getEmail());
     $this->setLangcode($account->getPreferredLangcode());
-    $this->setStatus($account->isActive());
+    if ($this->isConfirmed()) {
+      $this->setStatus($account->isActive() ? self::ACTIVE : self::INACTIVE);
+    }
 
-    // Copy values for shared fields to existing subscriber.
-    foreach ($this->getUserSharedFields($account) as $field_name) {
-      $this->set($field_name, $account->get($field_name)->getValue());
+    if ($shared_fields) {
+      // Copy values for shared fields to existing subscriber.
+      foreach ($this->getUserSharedFields($account) as $field_name) {
+        $this->set($field_name, $account->get($field_name)->getValue());
+      }
     }
 
     static::$syncing = FALSE;
@@ -174,29 +217,17 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
       }
       static::$syncing = FALSE;
     }
+
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getChanges() {
-    return unserialize($this->get('changes')->value);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setChanges($changes) {
-    $this->set('changes', serialize($changes));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isSubscribed($newsletter_id) {
-    foreach ($this->subscriptions as $item) {
+  public function isSubscribed(string $newsletter_id) {
+    foreach ($this->get('subscriptions') as $item) {
       if ($item->target_id == $newsletter_id) {
-        return $item->status == SIMPLENEWS_SUBSCRIPTION_STATUS_SUBSCRIBED;
+        return TRUE;
       }
     }
     return FALSE;
@@ -205,25 +236,13 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public function isUnsubscribed($newsletter_id) {
-    foreach ($this->subscriptions as $item) {
-      if ($item->target_id == $newsletter_id) {
-        return $item->status == SIMPLENEWS_SUBSCRIPTION_STATUS_UNSUBSCRIBED;
-      }
+  public function isUnsubscribed(string $newsletter_id) {
+    if ($this->isSubscribed($newsletter_id)) {
+      return FALSE;
     }
-    return FALSE;
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSubscription($newsletter_id) {
-    foreach ($this->subscriptions as $item) {
-      if ($item->target_id == $newsletter_id) {
-        return $item;
-      }
-    }
-    return FALSE;
+    // Check history.
+    return \Drupal::service('simplenews.subscription_manager')->hasSubscribed($this->getMail(), $newsletter_id);
   }
 
   /**
@@ -231,10 +250,8 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
    */
   public function getSubscribedNewsletterIds() {
     $ids = [];
-    foreach ($this->subscriptions as $item) {
-      if ($item->status == SIMPLENEWS_SUBSCRIPTION_STATUS_SUBSCRIBED) {
-        $ids[] = $item->target_id;
-      }
+    foreach ($this->get('subscriptions') as $delta => $item) {
+      $ids[$delta] = $item->target_id;
     }
     return $ids;
   }
@@ -242,44 +259,34 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public function subscribe($newsletter_id, $status = SIMPLENEWS_SUBSCRIPTION_STATUS_SUBSCRIBED, $source = 'unknown', $timestamp = REQUEST_TIME) {
-    if ($subscription = $this->getSubscription($newsletter_id)) {
-      $subscription->status = $status;
+  public function subscribe(string $newsletter_id) {
+    if (func_num_args() > 1) {
+      throw new \LogicException('Only one argument is supported');
     }
-    else {
-      $data = [
-        'target_id' => $newsletter_id,
-        'status' => $status,
-        'source' => $source,
-        'timestamp' => $timestamp,
-      ];
-      $this->subscriptions->appendItem($data);
+
+    if (!$this->isSubscribed($newsletter_id)) {
+      $this->get('subscriptions')->appendItem(['target_id' => $newsletter_id]);
     }
-    if ($status == SIMPLENEWS_SUBSCRIPTION_STATUS_SUBSCRIBED) {
-      \Drupal::moduleHandler()->invokeAll('simplenews_subscribe', [$this, $newsletter_id]);
-    }
+
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function unsubscribe($newsletter_id, $source = 'unknown', $timestamp = REQUEST_TIME) {
-    if ($subscription = $this->getSubscription($newsletter_id)) {
-      $subscription->status = SIMPLENEWS_SUBSCRIPTION_STATUS_UNSUBSCRIBED;
+  public function unsubscribe(string $newsletter_id) {
+    if (func_num_args() > 1) {
+      throw new \LogicException('Only one argument is supported');
     }
-    else {
-      $data = [
-        'target_id' => $newsletter_id,
-        'status' => SIMPLENEWS_SUBSCRIPTION_STATUS_UNSUBSCRIBED,
-        'source' => $source,
-        'timestamp' => $timestamp,
-      ];
-      $this->subscriptions->appendItem($data);
-    }
-    // Clear eventually existing mail spool rows for this subscriber.
+
+    $this->get('subscriptions')->filter(function ($s) use ($newsletter_id) {
+      return $s->target_id != $newsletter_id;
+    });
+
+    // Clear any existing mail spool rows for this subscriber.
     \Drupal::service('simplenews.spool_storage')->deleteMails(['snid' => $this->id(), 'newsletter_id' => $newsletter_id]);
 
-    \Drupal::moduleHandler()->invokeAll('simplenews_unsubscribe', [$this, $newsletter_id]);
+    return $this;
   }
 
   /**
@@ -289,9 +296,32 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
     parent::postSave($storage, $update);
 
     // Copy values for shared fields to existing user.
-    if ($user = $this->getUser()) {
+    if ($this->isConfirmed() && $user = $this->getUser()) {
       $this->copyToAccount($user);
     }
+
+    if ($this->isConfirmed()) {
+      // Call hooks.
+      $module_handler = \Drupal::moduleHandler();
+      $current = $this->getSubscribedNewsletterIds();
+      if (isset($this->original) && $this->original->isConfirmed()) {
+        $original = $this->original->getSubscribedNewsletterIds();
+      }
+      else {
+        $original = [];
+      }
+
+      foreach (array_diff($current, $original) as $newsletter_id) {
+        $module_handler->invokeAll('simplenews_subscribe', [$this, $newsletter_id]);
+      }
+
+      foreach (array_diff($original, $current) as $newsletter_id) {
+        $module_handler->invokeAll('simplenews_unsubscribe', [$this, $newsletter_id]);
+      }
+    }
+
+    // Track history.
+    \Drupal::service('simplenews.subscription_manager')->trackHistory($this);
   }
 
   /**
@@ -312,11 +342,22 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
-    // If there is not already a linked user, fill from an account with
-    // matching uid or email.
-    if (!$this->isNew() && !$this->getUserId() && $user = $this->getUser()) {
-      $this->fillFromAccount($user);
+    // If there is not already a linked user, copy base fields from an account
+    // with matching uid or email.
+    if ($this->isConfirmed() && !$this->getUserId() && $user = $this->getUser()) {
+      $this->fillFromAccount($user, FALSE);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sendConfirmation() {
+    $send = !$this->isConfirmed() && !static::skipConfirmation();
+    if ($send) {
+      \Drupal::service('simplenews.mailer')->sendSubscribeConfirmation($this);
+    }
+    return $send;
   }
 
   /**
@@ -351,28 +392,26 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields['id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Subscriber ID'))
-      ->setDescription(t('Primary key: Unique subscriber ID.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
+    // Fields id, uuid are set by the parent.
+    $fields = parent::baseFieldDefinitions($entity_type);
 
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The subscriber UUID.'))
-      ->setReadOnly(TRUE);
-
-    $fields['status'] = BaseFieldDefinition::create('boolean')
+    $fields['status'] = BaseFieldDefinition::create('list_tiny_integer')
       ->setLabel(t('Status'))
-      ->setDescription(t('Boolean indicating the status of the subscriber.'))
-      ->setDefaultValue(TRUE);
+      ->setDescription(t('Status of the subscriber.'))
+      ->setDefaultValue(SubscriberInterface::ACTIVE)
+      ->setRequired(TRUE)
+      ->setSetting('allowed_values', simplenews_subscriber_status_options())
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['mail'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Email'))
       ->setDescription(t("The subscriber's email address."))
       ->setSetting('default_value', '')
       ->setRequired(TRUE)
-      ->addConstraint('UniqueField', [])
+      ->addConstraint('SubscriberUniqueField', [])
       ->setDisplayOptions('form', [
         'type' => 'email_default',
         'settings' => [],
@@ -382,22 +421,24 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('User'))
       ->setDescription(t('The corresponding user.'))
+      ->addConstraint('UniqueField', [])
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default');
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language'))
-      ->setDescription(t("The subscriber's preferred language."));
-
-    $fields['changes'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Changes'))
-      ->setDescription(t('Contains the requested subscription changes.'));
+      ->setDescription(t("The subscriber's preferred language."))
+      ->setDisplayOptions('form', [
+        'type' => 'language_select',
+        'weight' => 2,
+      ]);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time that the subscriber was created.'));
+      ->setDescription(t('The time that the subscriber was created.'))
+      ->setDisplayConfigurable('form', TRUE);
 
-    $fields['subscriptions'] = BaseFieldDefinition::create('simplenews_subscription')
+    $fields['subscriptions'] = BaseFieldDefinition::create('entity_reference')
       ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
       ->setLabel(t('Subscriptions'))
       ->setDescription(t('Check the newsletters you want to subscribe to. Uncheck the ones you want to unsubscribe from.'))
@@ -407,7 +448,8 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
         'weight' => '0',
         'settings' => [],
         'third_party_settings' => [],
-      ]);
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }
@@ -415,10 +457,19 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function loadByMail($mail, $create = FALSE, $default_langcode = NULL) {
+  public static function loadByMail(string $mail, ?bool $create = FALSE, ?string $default_langcode = NULL, ?bool $check_trust = FALSE) {
     $subscriber = FALSE;
-    if ($mail) {
-      $subscribers = \Drupal::entityTypeManager()->getStorage('simplenews_subscriber')->loadByProperties(['mail' => $mail]);
+
+    // Trusted if currently logged in, or if confirmations are disabled.
+    $trusted = !$check_trust || static::skipConfirmation();
+
+    if ($mail && $trusted) {
+      $storage = \Drupal::entityTypeManager()->getStorage('simplenews_subscriber');
+      $query = $storage->getQuery()
+        ->condition('mail', $mail)
+        ->accessCheck(FALSE)
+        ->condition('status', self::UNCONFIRMED, '<>');
+      $subscribers = $storage->loadMultiple($query->execute());
       $subscriber = reset($subscribers);
     }
 
@@ -427,6 +478,9 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
       if ($default_langcode) {
         $subscriber->setLangcode($default_langcode);
       }
+      if (!$trusted) {
+        $subscriber->setStatus(self::UNCONFIRMED);
+      }
     }
     return $subscriber;
   }
@@ -434,10 +488,16 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function loadByUid($uid, $create = FALSE) {
+  public static function loadByUid(int $uid, ?bool $create = FALSE, ?bool $confirmed = TRUE) {
     $subscriber = FALSE;
     if ($uid) {
-      $subscribers = \Drupal::entityTypeManager()->getStorage('simplenews_subscriber')->loadByProperties(['uid' => $uid]);
+      $storage = \Drupal::entityTypeManager()->getStorage('simplenews_subscriber');
+      $query = $storage->getQuery()->condition('uid', $uid)->accessCheck(FALSE);
+
+      if ($confirmed) {
+        $query->condition('status', self::UNCONFIRMED, '<>');
+      }
+      $subscribers = $storage->loadMultiple($query->execute());
       $subscriber = reset($subscribers);
     }
 
@@ -445,6 +505,17 @@ class Subscriber extends ContentEntityBase implements SubscriberInterface {
       $subscriber = static::create(['uid' => $uid]);
     }
     return $subscriber;
+  }
+
+  /**
+   * Checks if subscriber confirmation should be skipped.
+   *
+   * @return bool
+   *   TRUE if confirmation should be skipped.
+   */
+  public static function skipConfirmation() {
+    // Skip if logged in or if configured to skip.
+    return \Drupal::currentUser()->id() || \Drupal::config('simplenews.settings')->get('subscription.skip_verification');
   }
 
 }

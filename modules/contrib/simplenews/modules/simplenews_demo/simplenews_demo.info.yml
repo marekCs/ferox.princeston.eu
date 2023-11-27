@@ -10,7 +10,7 @@ dependencies:
 hidden: false
 package: Mail
 
-# Information added by Drupal.org packaging script on 2023-04-14
-version: '3.0.0-beta5'
+# Information added by Drupal.org packaging script on 2023-10-10
+version: '4.0.0-alpha3'
 project: 'simplenews'
-datestamp: 1681467535
+datestamp: 1696957019
