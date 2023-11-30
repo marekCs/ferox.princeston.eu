@@ -1,0 +1,14 @@
+name: Splide Test
+description: 'Testing Splide.'
+type: module
+hidden: true
+package: Testing
+core_version_requirement: ^9.3 || ^10 || ^11
+dependencies:
+  - blazy:blazy_test (>= 3.x)
+  - splide:splide
+
+# Information added by Drupal.org packaging script on 2023-10-01
+version: '2.0.0'
+project: 'splide'
+datestamp: 1696142191

@@ -1,0 +1,93 @@
+/**
+ * @file.
+ * Provided basic styling for the Splide.
+ */
+
+.splide-wrapper,
+.splide,
+.splide * {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.splide--rtl {
+  direction: rtl;
+}
+
+/**
+ * Misc overrides core splide.
+ */
+.splide__slider {
+  position: relative;
+}
+
+.is-mounted .splide__slider {
+  overflow: visible;
+}
+
+.splide__slider::before,
+.splide__slider::after {
+  display: table;
+  content: "";
+}
+
+.splide__slider::after {
+  clear: both;
+}
+
+.splide img {
+  height: auto;
+  will-change: auto !important; /* csslint allow: known-properties, important */
+}
+
+.splide img,
+.splide iframe {
+  max-width: 100%;
+  border: 0;
+}
+
+/* Prevents overflowing nested slides. */
+.splide,
+.splide-wrapper {
+  position: relative;
+  max-width: 100%;
+}
+
+/** Prevents from being hidden due to layering issues with arrow down. */
+.splide__arrows {
+  z-index: 9;
+}
+
+.splide__arrow--down {
+  z-index: 8;
+}
+
+/* Above the arrows to allow hover thumbnail with pagination. */
+.splide .splide__pagination {
+  z-index: 10;
+}
+
+/* Above arrow and pagination. */
+.splide__toggle {
+  position: relative;
+  z-index: 11;
+}
+
+.splide--nav .slide {
+  height: inherit;
+}
+
+/* Fix for destroy. */
+.unsplide.splide .splide__list {
+  display: block;
+  width: 100%;
+}
+
+.unsplide.splide .splide__slide {
+  width: 100%;
+}
+
+/* V4 breaking changes. */
+.splide__track {
+  min-height: 12px;
+}

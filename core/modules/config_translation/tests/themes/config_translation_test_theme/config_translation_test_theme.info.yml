@@ -2,4 +2,9 @@ name: 'Configuration Translation Test Theme'
 type: theme
 base theme: stable9
 description: 'Theme for testing the configuration translation mapper system'
-version: VERSION
+# version: VERSION
+
+# Information added by Drupal.org packaging script on 2023-11-21
+version: '10.2.0-beta1'
+project: 'drupal'
+datestamp: 1700578825

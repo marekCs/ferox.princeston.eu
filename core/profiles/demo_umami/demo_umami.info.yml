@@ -1,7 +1,7 @@
 name: 'Demo: Umami Food Magazine (Experimental)'
 type: profile
 description: 'Install an example site that shows off some of Drupal’s capabilities.'
-version: VERSION
+# version: VERSION
 install:
   - node
   - history
@@ -37,7 +37,6 @@ install:
   - file
   - views
   - views_ui
-  - tour
   - automated_cron
   - responsive_image
   - content_moderation
@@ -50,3 +49,8 @@ themes:
   - claro
   - umami
 keep_english: true
+
+# Information added by Drupal.org packaging script on 2023-11-21
+version: '10.2.0-beta1'
+project: 'drupal'
+datestamp: 1700578825

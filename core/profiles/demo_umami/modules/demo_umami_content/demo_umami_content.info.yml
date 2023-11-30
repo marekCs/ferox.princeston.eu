@@ -1,7 +1,7 @@
 name: 'Umami demo: Content'
 description: Imports the content for the Umami demo.
 type: module
-version: VERSION
+# version: VERSION
 package: 'Core (Experimental)'
 lifecycle: experimental
 hidden: true
@@ -15,3 +15,8 @@ dependencies:
   - drupal:taxonomy
   - drupal:text
   - drupal:user
+
+# Information added by Drupal.org packaging script on 2023-11-21
+version: '10.2.0-beta1'
+project: 'drupal'
+datestamp: 1700578825

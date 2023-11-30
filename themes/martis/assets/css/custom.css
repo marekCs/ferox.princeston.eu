@@ -1,9 +1,40 @@
-/* Skryje text jazyka, ale ponechá vlajky */
-.lang-dropdown-select-element .nice-select .current {
-  display: none; /* Skryje text jazyka */
+.carousel-image img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
-/* Zajistí, že vlajka zůstane viditelná */
-.language-icon {
-  display: inline-block; /* Zobrazí vlajku */
+button.splide__toggle {
+  display: none;
+}
+
+.h-5 {
+  min-height: 5em;
+  padding: 3px 0px 3px 0px;
+}
+
+/* This is for the positioning of the percentage text inside the circle */
+
+.text-content {
+  display: inline-block;
+  text-align: left;
+  vertical-align: top; /* Aligns with the top of the chart */
+  margin-left: 40px; /* Adjust as needed */
+  max-width: calc(100% - 130px); /* Prevents text from overlapping the chart */
+}
+
+/* Adjust the container column if necessary to reduce vertical spacing */
+.col-sm-4.col-12 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row; /* Align items in a row instead of column */
+  min-height: auto; /* Changed from 350px to auto */
+}
+
+/* Additional styling for text centering and spacing */
+.my-col h4,
+.my-col p {
+  margin-top: 20px; /* Adjust as needed for spacing */
+  font-size: 95%;
 }

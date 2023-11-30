@@ -1,6 +1,10 @@
 name: Announcements
 type: module
 description: Displays announcements from the Drupal community.
-version: VERSION
-package: Core (Experimental)
-lifecycle: experimental
+# version: VERSION
+package: Core
+
+# Information added by Drupal.org packaging script on 2023-11-21
+version: '10.2.0-beta1'
+project: 'drupal'
+datestamp: 1700578825

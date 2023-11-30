@@ -440,8 +440,7 @@ var $ = (jquery = jQuery);
             if (imagePos < topOfWindow + 900) {
               $(this).easyPieChart({
                 barColor: "#333333",
-                trackColor: "#dcdcdc",
-                trackWidth: 6,
+                trackColor: "#f5f5f5",
                 scaleColor: false,
                 scaleLength: false,
                 //lineCap: 'butt',

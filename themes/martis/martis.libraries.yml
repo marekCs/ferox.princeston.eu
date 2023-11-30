@@ -12,6 +12,7 @@ global:
     assets/js/jquery.easypiechart.min.js: {}
     assets/js/jquery.countTo.js: {}
     assets/js/script.js: {}
+    assets/js/custom.js: {}
   dependencies:
     - core/jquery
     - core/jquery.once

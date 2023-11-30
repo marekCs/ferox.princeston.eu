@@ -1,37 +1,58 @@
 {#
   /**
    * @file
-   * Theme override to display a carousel block.
+   * Theme override to display a custom carousel block with Bootstrap.
    */
 #}
+
 {% set classes = [
   'block',
-  'carousel-block',
+  'feature-block',
   'block-' ~ configuration.provider|clean_class,
   'block-' ~ plugin_id|clean_class,
 ] %}
-{% set align = content.field_image_align['#items'].getValue()|first.value %}
+
+{% set align_value = content.field_image_align['#items'].value %}
+
+{% if align_value == 'left' %}
+    {% set image_order_class = 'order-md-1' %}
+    {% set text_order_class = 'order-md-2' %}
+{% elseif align_value == 'right' %}
+    {% set image_order_class = 'order-md-2' %}
+    {% set text_order_class = 'order-md-1' %}
+{% endif %}
 
 <div{{ attributes.addClass(classes) }}>
-  <div class="container-wrap clearfix">
-    {{ title_prefix }}
-    {{ title_suffix }}
-    <div class="row block-content">
-      {% if align == 'Left' %}
-        <div class="col-md-6">
-          {{ content.field_test }}
+  {{ title_prefix }}
+  {{ title_suffix }}
+
+  {% block content %}
+    <div class="container">
+      <div class="row">
+        <!-- Obrázek s příslušným pořadím pro Bootstrap -->
+        <div class="col-12 col-md-6 pl-0 pr-0 {{ image_order_class }}">
+          <div class="carousel-image">
+            {{ content.field_image }}
+          </div>
         </div>
-        <div class="col-md-6">
-          {{ content.body }}
+
+        <!-- Text s příslušným pořadím pro Bootstrap -->
+        <div class="col-12 col-md-6 pl-0 pr-0 {{ text_order_class }}">
+          <div class="carousel-content p-4">
+            {% if label %}
+              <div class="carousel-title">
+                <h2>{{ label }}</h2>
+                {% if block_subtitle %}
+                  <h5>{{ block_subtitle }}</h5>
+                {% endif %}
+              </div>
+            {% endif %}
+            <div class="carousel-text">
+              {{ content.body }}
+            </div>
+          </div>
         </div>
-      {% else %}
-        <div class="col-md-6">
-          {{ content.body }}
-        </div>
-        <div class="col-md-6">
-          {{ content.field_test }}
-        </div>
-      {% endif %}
+      </div>
     </div>
-  </div>
+  {% endblock %}
 </div>
