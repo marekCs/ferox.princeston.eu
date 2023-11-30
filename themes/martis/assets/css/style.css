@@ -5727,6 +5727,7 @@ fieldset {
   transform: translate(-50%, -50%);
   font-size: 24px;
   z-index: 2;
+  font-weight: bold;
 }
 
 .percent:after {
