@@ -440,14 +440,15 @@ var $ = (jquery = jQuery);
             if (imagePos < topOfWindow + 900) {
               $(this).easyPieChart({
                 barColor: "#333333",
-                trackColor: "#f5f5f5",
+                trackColor: "#dddddd",
                 scaleColor: false,
                 scaleLength: false,
                 //lineCap: 'butt',
-                lineWidth: 4,
+                lineWidth: 5,
                 size: 110,
                 rotate: 0,
                 animate: 3000,
+                fillStyle: "#e8e8e8",
                 onStep: function (from, to, percent) {
                   $(this.el).find(".percent").text(Math.round(percent));
                 },
